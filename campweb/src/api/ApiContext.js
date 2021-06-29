@@ -5,7 +5,7 @@ export const ApiContext = React.createContext(null);
 export const apiVersion = "1.251";
 export const projectKey = "Campfire";
 
-export const proxyAddr = "ws://192.168.1.104:8090/";
+export const proxyAddr = "wss://campweb-proxy.herokuapp.com/";
 
 export const languageEn = 1;
 export const languageRu = 2;

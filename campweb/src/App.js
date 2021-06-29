@@ -1,6 +1,6 @@
 import './App.css';
 import { createMuiTheme, ThemeProvider, CssBaseline, Box, Snackbar } from '@material-ui/core';
-import { BrowserRouter as Router, Switch, Route, useHistory } from "react-router-dom";
+import { BrowserRouter as Router, Switch, Route, useHistory, Redirect } from "react-router-dom";
 import Login from "./pages/Login";
 import { ApiClient, ApiContext } from './api/ApiContext';
 import Feed from './pages/Feed';
@@ -55,6 +55,7 @@ function App() {
           >
             <CssBaseline />
             <Switch>
+              <Route path="/" exact><Redirect to="/login" /></Route>
               <Route path="/login"><Login /></Route>
               <Route path="/feed"><Feed /></Route>
             </Switch>
