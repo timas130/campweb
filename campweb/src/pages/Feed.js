@@ -11,8 +11,9 @@ import { useHistory } from "react-router";
 async function loadMorePosts(apiClient, posts, setPosts, loading, setLoading, tab) {
   if (loading) return;
   setLoading(true);
+
   let response;
-  console.log("reloading posts, tab", tab);
+  console.log("[feed] loading more posts, tab", tab);
   if (tab === 0) {
     response = JSON.parse((await apiClient
       .makeRequest(new RPostFeedGetAllSubscribe(
@@ -51,7 +52,6 @@ function Feed() {
   }, [apiClient, posts, loading, tab]);
 
   const onBottom = (inView) => {
-    console.log("inView onChange", inView, loading);
     if (inView && !loading) {
       loadMorePosts(apiClient, posts, setPosts, loading, setLoading, tab);
     }

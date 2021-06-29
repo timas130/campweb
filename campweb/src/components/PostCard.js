@@ -9,14 +9,17 @@ import { ArrowDownward, ArrowUpward, Comment } from "@material-ui/icons";
 import { theme } from "../App";
 import { ApiContext } from "../api/ApiContext";
 import RPublicationsKarmaAdd from "../api/requests/post/RPublicationsKarmaAdd";
+import { useHistory } from "react-router";
+import Karma from "./Karma";
 
 function PostCard(props) {
   // campfire in a nutshell
   const pages = JSON.parse(JSON.parse(props.post.jsonDB)["J_PAGES"]);
 
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, setExpanded] = useState(!! props.fullPage);
   const [voted, setVoted] = useState(0);
   const apiClient = useContext(ApiContext);
+  const history = useHistory();
 
   const addKarma = async (up) => {
     // TODO: anonymous voting
@@ -26,8 +29,8 @@ function PostCard(props) {
     setVoted(resp.myKarmaCount);
   };
 
-  return (
-    <Card style={{marginBottom: 10}}>
+  return (<div style={{paddingBottom: 10, paddingTop: 10}}>
+    <Card>
       <CardHeader
         avatar={
           <Avatar>
@@ -56,41 +59,34 @@ function PostCard(props) {
         </Collapse>
       </CardContent>
       <CardActions>
-        <Button onClick={() => setExpanded(! expanded)}>
+        {props.fullPage ? "" : <Button onClick={() => setExpanded(! expanded)}>
           {expanded ? "Свернуть" : `Раскрыть (${pages.length})`}
-        </Button>
+        </Button>}
 
         {/* Karma */}
-        <Button size="small" style={{marginLeft: "auto"}}>
+        <Button
+          size="small" style={{marginLeft: "auto"}}
+          onClick={() => history.push("/post/" + props.post.id)}
+        >
           <Comment fontSize="small" style={{marginRight: 5}} />
           {props.post.subUnitsCount}
         </Button>
         <IconButton
-          size="small"
-          disabled={!!(props.post.myKarma || voted)}
-          onClick={() => addKarma(false)}
+          size="small" onClick={() => addKarma(false)}
+          disabled={!! (props.post.myKarma || voted)}
         >
           <ArrowDownward htmlColor={props.post.myKarma < 0 ? theme.palette.success.main : null } />
         </IconButton>
-        <span style={{
-          color:
-            props.post.karmaCount > 0 ? theme.palette.success.main :
-            props.post.karmaCount < 0 ? theme.palette.error.main :
-            theme.palette.text.primary,
-          fontWeight: "bold"
-        }}>
-          {(props.post.karmaCount + voted) / 100}
-        </span>
+        <Karma amount={props.post.karmaCount + voted} />
         <IconButton
-          size="small"
+          size="small" onClick={() => addKarma(true)}
           disabled={!! (props.post.myKarma || voted)}
-          onClick={() => addKarma(true)}
         >
           <ArrowUpward htmlColor={props.post.myKarma > 0 ? theme.palette.success.main : null } />
         </IconButton>
       </CardActions>
     </Card>
-  );
+  </div>);
 }
 
 export default PostCard;

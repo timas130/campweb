@@ -227,7 +227,7 @@ function FormattedText(props) {
         linkHref = linkHref.slice(0, linkHref.length - 3);
         br = true;
       }
-      result += "<a class=\"" + linkClass + "\" href=\"" + linkHref + "\" target=\"_blank\">" + linkText + "</a>";
+      result += "<a class=\"" + linkClass + "\" href=\"" + linkHref + "\" target=\"_blank\">" + linkText + "</a> ";
       if (br) result += "<br";
       linkPart = 0;
       linkHref = "";

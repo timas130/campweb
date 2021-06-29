@@ -20,7 +20,8 @@ function CampfireImage(props) {
       onClick={() => props.backdrop && setBackdrop(true)} />
     <Backdrop open={backdrop} onClick={() => setBackdrop(false)} style={{zIndex: 99999, padding: 10}}>
       <img src={image} alt={props.id.toString()} style={{
-        maxWidth: "100%"
+        maxWidth: "100%",
+        maxHeight: "100%"
       }} />
     </Backdrop>
   </>) : (

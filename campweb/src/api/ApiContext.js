@@ -5,7 +5,10 @@ export const ApiContext = React.createContext(null);
 export const apiVersion = "1.251";
 export const projectKey = "Campfire";
 
-export const proxyAddr = "wss://campweb-proxy.herokuapp.com/";
+export const proxyAddr =
+  process.env.NODE_ENV === "production" ?
+  "wss://campweb-proxy.herokuapp.com/" :
+  "ws://192.168.1.104:8080/";
 
 export const languageEn = 1;
 export const languageRu = 2;
@@ -167,7 +170,8 @@ export class ApiClient {
       }
       
       console.log(`[${req["J_REQUEST_NAME"]}] queue id ${id}, sending request`);
-      console.log(payload.replace(this.accessToken, "...").replace(this.loginToken, "..."));
+      if (process.env.NODE_ENV === "development")
+        console.log(payload.replace(this.accessToken, "...").replace(this.loginToken, "..."));
       this.ws.send(payload);
     });
   }

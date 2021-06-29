@@ -9,7 +9,7 @@ function PageImages(props) {
         <Typography variant="body1">{props.page.title}</Typography> :
         ""
       }
-      <GridList cellHeight={160} cols={3}>
+      <GridList component="div" cellHeight={160} cols={3}>
         {JSON.parse(props.page.imagesIds).map((id) => (
           <GridListTile key={id}>
             <CampfireImage id={id} backdrop style={{
