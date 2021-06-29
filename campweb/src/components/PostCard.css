@@ -1,0 +1,11 @@
+.MuiCollapse-container {
+  position: relative;
+}
+.MuiCollapse-container:not(.MuiCollapse-entered)::before {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0;
+  width: 100%; height: 5%;
+  background: linear-gradient(180deg, transparent, rgb(33, 33, 33));
+  z-index: 10;
+}

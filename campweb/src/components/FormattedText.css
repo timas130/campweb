@@ -1,0 +1,12 @@
+.fmt__bold {
+  font-weight: bold;
+}
+.fmt__italic {
+  font-style: italic;
+}
+.fmt__underlined {
+  text-decoration: underline;
+}
+.fmt__striked {
+  text-decoration: line-through;
+}

@@ -1,0 +1,29 @@
+.login {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.login__logo {
+  padding-bottom: 20px;
+}
+
+.login__title {
+  margin: 0 0 10px;
+}
+
+.login__form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+.login__form .MuiTextField-root {
+  margin: 5px;
+}
+.login__form .MuiButtonGroup-root {
+  margin-top: 10px;
+  align-self: flex-end;
+}
