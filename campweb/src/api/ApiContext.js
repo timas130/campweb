@@ -4,6 +4,7 @@ import md5 from "md5";
 export const ApiContext = React.createContext(null);
 export const apiVersion = "1.251";
 export const projectKey = "Campfire";
+export const protoadmins = [1];
 
 export const proxyAddr =
   process.env.NODE_ENV === "production" ?
@@ -12,6 +13,8 @@ export const proxyAddr =
 
 export const languageEn = 1;
 export const languageRu = 2;
+
+export const activitiesRaceTime = 86400000;
 
 function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
@@ -46,9 +49,11 @@ export class ApiClient {
     this.ws = new WebSocket(proxyAddr);
     this.ws.onerror = () => {
       console.error("failed to reconnect");
+      this.onError && this.onError("Failed to reconnect to the server");
     };
     this.ws.onclose = () => {
       console.error("failed to reconnect");
+      this.onError && this.onError("Failed to reconnect to the server");
     };
     setTimeout(() => {
       this.ws.onclose = () => this.reconnect();

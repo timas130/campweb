@@ -1,4 +1,4 @@
-import { ListItem, ListItemAvatar, Avatar, ListItemText, Typography, ListItemSecondaryAction, Box, IconButton, Paper } from "@material-ui/core";
+import { ListItem, ListItemAvatar, ListItemText, Typography, ListItemSecondaryAction, Box, IconButton, Paper } from "@material-ui/core";
 import CampfireImage from "./CampfireImage";
 import React, { useContext, useState } from "react";
 import moment from "moment";
@@ -8,6 +8,7 @@ import FormattedText from "./FormattedText";
 import PageImages from "./pages/PageImages";
 import { ApiContext } from "../api/ApiContext";
 import RPublicationsKarmaAdd from "../api/requests/post/RPublicationsKarmaAdd";
+import CampfireAvatar from "./CampfireAvatar";
 
 function CommentQuote(props) {
   return (
@@ -39,6 +40,30 @@ function CommentQuote(props) {
   );
 }
 
+function CommentContent(props) {
+  return (
+    <>
+      <FormattedText text={props.jsonDB["J_TEXT"]} />
+      {
+        props.jsonDB.imageId ?
+        <>
+          <br /><CampfireImage id={props.jsonDB.imageId} style={{
+            maxWidth: "100%"
+          }} backdrop />
+        </> :
+        ""
+      }
+      { /* TODO: sticker link */
+        props.jsonDB.stickerImageId ?
+        <>
+          <br /><CampfireImage id={props.jsonDB.stickerImageId} />
+        </> :
+        ""
+      }
+    </>
+  );
+}
+
 function Comment(props) {
   const jsonDB = JSON.parse(props.comment.jsonDB);
   const [voted, setVoted] = useState(0);
@@ -63,12 +88,7 @@ function Comment(props) {
     <ListItem alignItems="flex-start">
       <ListItemAvatar>
         <React.Fragment>
-          <Avatar>
-            <CampfireImage
-              id={props.comment.creator["J_IMAGE_ID"]}
-              style={{width: "100%"}}
-            />
-          </Avatar>
+          <CampfireAvatar account={props.comment.creator} /><br />
           <IconButton size="small" style={{
             marginTop: 5,
             marginLeft: 5,
@@ -89,23 +109,7 @@ function Comment(props) {
             </Typography>
             <Typography component="div" variant="body1" color="textPrimary">
               <CommentQuote jsonDB={jsonDB} quoteText={quoteText} />
-              <FormattedText text={jsonDB["J_TEXT"]} />
-              {
-                jsonDB.imageId ?
-                <>
-                  <br /><CampfireImage id={jsonDB.imageId} style={{
-                    maxWidth: "100%"
-                  }} backdrop />
-                </> :
-                ""
-              }
-              { /* TODO: sticker link */
-                jsonDB.stickerImageId ?
-                <>
-                  <br /><CampfireImage id={jsonDB.stickerImageId} />
-                </> :
-                ""
-              }
+              <CommentContent jsonDB={jsonDB} />
             </Typography>
           </React.Fragment>
         } />

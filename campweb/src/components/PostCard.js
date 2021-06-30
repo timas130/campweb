@@ -11,6 +11,7 @@ import { ApiContext } from "../api/ApiContext";
 import RPublicationsKarmaAdd from "../api/requests/post/RPublicationsKarmaAdd";
 import { useHistory } from "react-router";
 import Karma from "./Karma";
+import UserActivity from "./pages/UserActivity";
 
 function PostCard(props) {
   // campfire in a nutshell
@@ -30,10 +31,10 @@ function PostCard(props) {
   };
 
   return (<div style={{paddingBottom: 10, paddingTop: 10}}>
-    <Card>
+    <Card style={{background: theme.palette.background.default}}>
       <CardHeader
         avatar={
-          <Avatar>
+          <Avatar variant={theme.avatarVariant}>
             <CampfireImage id={props.post.fandom.imageId}
               style={{width: "100%"}} />
           </Avatar>
@@ -41,11 +42,22 @@ function PostCard(props) {
         title={props.post.fandom.name}
         subheader={
           <span>
-            <Link href={`/account/${props.post.creator["J_ID"]}`}>{props.post.creator["J_NAME"]}</Link>
+            <Link href={`/account/${props.post.creator["J_ID"]}`}>
+              {props.post.creator["J_NAME"]}
+            </Link>
             &nbsp;{moment(props.post.dateCreate).locale("ru").calendar()}&nbsp;
             {
+              props.post.userActivity ?
+              <Link href={`/activity/${props.post.userActivity.id}`}>
+                {props.post.userActivity.name}
+              </Link> :
+              ""
+            }
+            {
               props.post.rubricId ?
-              <Link href={`/rubric/${props.post.rubricId}`}>{props.post.rubricName}</Link> :
+              <Link href={`/rubric/${props.post.rubricId}`}>
+                {props.post.rubricName}
+              </Link> :
               ""
             }
           </span>
@@ -56,6 +68,10 @@ function PostCard(props) {
           {pages.map((page, idx) => (
             <Page page={page} key={idx} />
           ))}
+          {
+            props.post.userActivity && 
+            <UserActivity activity={props.post.userActivity} />
+          }
         </Collapse>
       </CardContent>
       <CardActions>

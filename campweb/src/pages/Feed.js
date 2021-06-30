@@ -1,4 +1,4 @@
-import { CircularProgress, Container, Tabs, Tab } from "@material-ui/core";
+import { CircularProgress, Container, Tabs, Tab, Typography } from "@material-ui/core";
 import { useContext, useEffect, useState } from "react";
 import { ApiContext } from "../api/ApiContext";
 import PostCard from "../components/PostCard";
@@ -7,6 +7,8 @@ import InView from "react-intersection-observer";
 import { Alert, AlertTitle } from "@material-ui/lab";
 import RPostFeedGetAllSubscribe from "../api/requests/post/RPostFeedGetAllSubscribe";
 import { useHistory } from "react-router";
+import { useLoggedIn } from "../App";
+import { version } from "../../package.json";
 
 async function loadMorePosts(apiClient, posts, setPosts, loading, setLoading, tab) {
   if (loading) return;
@@ -43,9 +45,7 @@ function Feed() {
   const [tab, setTab] = useState(0);
   const history = useHistory()
 
-  useEffect(() => {
-    if (! apiClient.loginInfo) history.push("/login");
-  });
+  useLoggedIn(history, apiClient);
   useEffect(() => {
     if (posts.length === 0)
       loadMorePosts(apiClient, posts, setPosts, loading, setLoading, tab);
@@ -67,8 +67,12 @@ function Feed() {
       <div style={{paddingTop: 10, paddingBottom: 10}}><Alert severity="error">
         <AlertTitle>Известные баги/что пока не работает:</AlertTitle>
         1. В свернутом виде посты могут быть больше, чем в развернётом<br />
-        2. Иногда теряется сессия<br />
-        3. Нельзя сделать ничего, есть только посты тут. Разве что можно ставить карму.<br />
+        2. Может потерятся сессия<br />
+        3. Всё, что не нажимается, не работает<br />
+        4. Если зайти в ленту с любой другой страницы, то она сбросится<br />
+        <Typography variant="caption">
+          Версия клиента: {version}
+        </Typography>
       </Alert></div>
       <Tabs value={tab}
         onChange={onTabChange} variant="scrollable"

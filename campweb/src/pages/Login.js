@@ -25,7 +25,9 @@ function Login() {
       if (! apiClient.accessToken)
         throw new Error("Server didn't send access token!");
       setLoading(false);
-      history.push("/feed");
+
+      const next = new URLSearchParams(history.location.search).get("next");
+      history.replace(next || "/feed");
     } catch (e) {
       setError(e);
       console.error("error", e);

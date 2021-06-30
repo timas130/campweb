@@ -18,20 +18,14 @@ function Tag(props) {
 function Tags(props) {
   return (
     <div>
-      {
-        props.tags
-          .filter(tag => tag.parentUnitId === 0)
-          .map(
-            tag => <>
-              <Tag main jsonDB={JSON.parse(tag.jsonDB)} />
-              {
-                props.tags
-                  .filter(childTag => childTag.parentUnitId === tag.id)
-                  .map(childTag => <Tag jsonDB={JSON.parse(childTag.jsonDB)} />)
-              }
-            </>
-          )
-      }
+      {props.tags
+        .filter(tag => tag.parentUnitId === 0)
+        .map(tag => <>
+          <Tag main key={tag.id} jsonDB={JSON.parse(tag.jsonDB)} />
+          {props.tags
+            .filter(childTag => childTag.parentUnitId === tag.id)
+            .map(childTag => <Tag key={childTag.id} jsonDB={JSON.parse(childTag.jsonDB)} />)}
+        </>)}
     </div>
   );
 }

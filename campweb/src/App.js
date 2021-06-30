@@ -4,7 +4,7 @@ import { BrowserRouter as Router, Switch, Route, useHistory, Redirect } from "re
 import Login from "./pages/Login";
 import { ApiClient, ApiContext } from './api/ApiContext';
 import Feed from './pages/Feed';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Alert } from '@material-ui/lab';
 import Post from "./pages/Post";
 import AppToolbar from './components/AppToolbar';
@@ -12,7 +12,9 @@ import AppToolbar from './components/AppToolbar';
 export const theme = createMuiTheme({
   palette: {
     type: "dark",
-    background: "#212121",
+    background: {
+      default: "#212121"
+    },
     primary: {
       main: "#ff6c01"
     },
@@ -29,6 +31,8 @@ export const theme = createMuiTheme({
       main: "#ff770b"
     }
   }
+}, {
+  avatarVariant: "rounded"
 });
 
 const client = new ApiClient();
@@ -43,6 +47,19 @@ function HideOnScroll(props) {
       {children}
     </Slide>
   );
+}
+
+export const useLoggedIn = (history, apiClient) => {
+  useEffect(() => {
+    if (! apiClient.loginInfo) {
+      const params = new URLSearchParams();
+      params.append("next", history.location.pathname);
+      history.push({
+        pathname: "/login",
+        search: params.toString()
+      });
+    }
+  });
 }
 
 function App() {
@@ -72,7 +89,6 @@ function App() {
           <Box
             component="main"
             style={{
-              background: theme.palette.background,
               minHeight: "100vh"
             }}
           >
