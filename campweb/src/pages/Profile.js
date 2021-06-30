@@ -40,7 +40,6 @@ function Account(props) {
 
   const [pubs, setPubs] = useState([]);
   const [pubsEnd, setPubsEnd] = useState(false);
-  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     async function loadProfile() {
@@ -274,6 +273,8 @@ function Account(props) {
               return <PostCard key={pub.id} post={pub} />;
             } else if (pub.unitType === API["PUBLICATION_TYPE_COMMENT"]) {
               return <Comment key={pub.id} comment={pub} />;
+            } else {
+              return "";
             }
           })}</List>
           {

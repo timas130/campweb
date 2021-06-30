@@ -54,7 +54,7 @@ function PostCard(props) {
               props.post.userActivity ?
               <Link
                 component={RouterLink}
-                href={`/activity/${props.post.userActivity.id}`}
+                to={`/activity/${props.post.userActivity.id}`}
               >
                 {props.post.userActivity.name}
               </Link> :
@@ -64,7 +64,7 @@ function PostCard(props) {
               props.post.rubricId ?
               <Link
                 component={RouterLink}
-                href={`/rubric/${props.post.rubricId}`}
+                to={`/rubric/${props.post.rubricId}`}
               >
                 {props.post.rubricName}
               </Link> :
