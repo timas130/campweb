@@ -8,12 +8,14 @@ import { useEffect, useState } from 'react';
 import { Alert } from '@material-ui/lab';
 import Post from "./pages/Post";
 import AppToolbar from './components/AppToolbar';
+import Account from './pages/Profile';
 
 export const theme = createMuiTheme({
   palette: {
     type: "dark",
     background: {
-      default: "#212121"
+      default: "#030303",
+      paper: "#212121"
     },
     primary: {
       main: "#ff6c01"
@@ -98,6 +100,7 @@ function App() {
               <Route path="/login"><Login /></Route>
               <Route path="/feed"><Feed /></Route>
               <Route path="/post/:postId"><Post /></Route>
+              <Route path="/account/:accountId" exact><Account /></Route>
             </Switch>
           </Box>
           <Snackbar open={!!error} autoHideDuration={5000} onClose={closeSnackbar}>

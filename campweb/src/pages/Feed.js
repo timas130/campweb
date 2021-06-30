@@ -1,4 +1,4 @@
-import { CircularProgress, Container, Tabs, Tab, Typography } from "@material-ui/core";
+import { CircularProgress, Container, Tabs, Tab, Typography, Link } from "@material-ui/core";
 import { useContext, useEffect, useState } from "react";
 import { ApiContext } from "../api/ApiContext";
 import PostCard from "../components/PostCard";
@@ -66,7 +66,7 @@ function Feed() {
     <Container maxWidth="sm">
       <div style={{paddingTop: 10, paddingBottom: 10}}><Alert severity="error">
         <AlertTitle>Известные баги/что пока не работает:</AlertTitle>
-        1. В свернутом виде посты могут быть больше, чем в развернётом<br />
+        1. В свернутом виде посты могут быть больше, чем в развернётом <Link href="/post/3801432">(тест)</Link><br />
         2. Может потерятся сессия<br />
         3. Всё, что не нажимается, не работает<br />
         4. Если зайти в ленту с любой другой страницы, то она сбросится<br />

@@ -12,6 +12,7 @@ import RPublicationsKarmaAdd from "../api/requests/post/RPublicationsKarmaAdd";
 import { useHistory } from "react-router";
 import Karma from "./Karma";
 import UserActivity from "./pages/UserActivity";
+import { Link as RouterLink } from "react-router-dom";
 
 function PostCard(props) {
   // campfire in a nutshell
@@ -42,20 +43,29 @@ function PostCard(props) {
         title={props.post.fandom.name}
         subheader={
           <span>
-            <Link href={`/account/${props.post.creator["J_ID"]}`}>
+            <Link
+              component={RouterLink}
+              to={`/account/${props.post.creator["J_ID"]}`}
+            >
               {props.post.creator["J_NAME"]}
             </Link>
             &nbsp;{moment(props.post.dateCreate).locale("ru").calendar()}&nbsp;
             {
               props.post.userActivity ?
-              <Link href={`/activity/${props.post.userActivity.id}`}>
+              <Link
+                component={RouterLink}
+                href={`/activity/${props.post.userActivity.id}`}
+              >
                 {props.post.userActivity.name}
               </Link> :
               ""
             }
             {
               props.post.rubricId ?
-              <Link href={`/rubric/${props.post.rubricId}`}>
+              <Link
+                component={RouterLink}
+                href={`/rubric/${props.post.rubricId}`}
+              >
                 {props.post.rubricName}
               </Link> :
               ""

@@ -1,20 +1,16 @@
 import React from "react";
 import md5 from "md5";
+import API from "./api.json";
 
 export const ApiContext = React.createContext(null);
 export const apiVersion = "1.251";
-export const projectKey = "Campfire";
+export const projectKey = API["PROJECT_KEY_CAMPFIRE"];
 export const protoadmins = [1];
 
 export const proxyAddr =
   process.env.NODE_ENV === "production" ?
   "wss://campweb-proxy.herokuapp.com/" :
   "ws://192.168.1.104:8080/";
-
-export const languageEn = 1;
-export const languageRu = 2;
-
-export const activitiesRaceTime = 86400000;
 
 function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
@@ -121,11 +117,6 @@ export class ApiClient {
         this.ws.onclose = () => this.reconnect();
         this.ws.onerror = () => this.reconnect();
 
-        if (req["__proxy_error__"]) {
-          reject("Proxy error: " + req["__proxy_error__"]);
-          lockResolve();
-          return;
-        }
         if (req["__type__"] === "binary") {
           resolve(ev.data);
           lockResolve();
@@ -137,6 +128,11 @@ export class ApiClient {
           data = JSON.parse(ev.data)
         } catch (e) {
           reject("Failed to parse response");
+          lockResolve();
+          return;
+        }
+        if (data["__proxy_error__"]) {
+          reject("Proxy error: " + data["__proxy_error__"]);
           lockResolve();
           return;
         }

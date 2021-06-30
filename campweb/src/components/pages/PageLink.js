@@ -19,7 +19,7 @@ function PageLink(props) {
             overflow: "hidden",
             textOverflow: "ellipsis",
             display: "block"
-          }} href={props.page.link}>{props.page.link}</Link>
+          }} href={props.page.link} target="_blank">{props.page.link}</Link>
         </Box>
       </Box>
     </Paper>

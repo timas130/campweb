@@ -1,9 +1,10 @@
 import { Card, CardHeader, CardContent, Typography, withStyles, CardActions, Button } from "@material-ui/core";
 import moment from "moment";
 import { useContext, useEffect, useState } from "react";
-import { activitiesRaceTime, ApiContext } from "../../api/ApiContext";
+import { ApiContext } from "../../api/ApiContext";
 import { theme } from "../../App";
 import CampfireAvatar from "../CampfireAvatar";
+import API from "../../api/api.json";
 import RActivitiesRelayRaceMember from "../../api/requests/activities/RActivitiesRelayRaceMember";
 
 const UserActivityNext = withStyles({
@@ -24,7 +25,7 @@ function UserActivity(props) {
   useEffect(() => {
     const interval = setInterval(() => {
       setDate(new Date());
-      if (new Date().getTime() > (props.activity.tag_2 + activitiesRaceTime) * 1000) {
+      if (new Date().getTime() > (props.activity.tag_2 + API["ACTIVITIES_RELAY_RACE_TIME"]) * 1000) {
         setCurrentAccount(null);
       }
     }, 1000);
@@ -63,7 +64,7 @@ function UserActivity(props) {
         </div>
         {props.activity.tag_2 ? <div style={{marginLeft: "auto", textAlign: "right"}}>
           <Typography variant="body1">
-            {moment(props.activity.tag_2 + activitiesRaceTime).locale("ru").fromNow(true)}
+            {moment(props.activity.tag_2 + API["ACTIVITIES_RELAY_RACE_TIME"]).locale("ru").fromNow(true)}
           </Typography>
           <Typography variant="body2" color="textSecondary">
             Времени осталось

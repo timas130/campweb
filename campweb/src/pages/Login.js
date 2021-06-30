@@ -2,7 +2,8 @@ import { Container, TextField, ButtonGroup, Button, Link, Backdrop, CircularProg
 import { Alert, AlertTitle } from "@material-ui/lab";
 import { useContext, useEffect, useState } from "react";
 import { useHistory } from "react-router";
-import { ApiContext, languageRu } from "../api/ApiContext";
+import { ApiContext } from "../api/ApiContext";
+import API from "../api/api.json";
 import RAccountsLogin from "../api/requests/accounts/RAccountsLogin";
 import logo from "../logo.svg";
 import "./Login.css";
@@ -19,7 +20,7 @@ function Login() {
     setLoading(true);
     setError(null);
     try {
-      const req = new RAccountsLogin(languageRu);
+      const req = new RAccountsLogin(API["LANGUAGE_RU"]);
       if (email && password) apiClient.setLoginTokenEmail(email, password);
       console.log("login", await apiClient.makeRequest(req));
       if (! apiClient.accessToken)
@@ -45,15 +46,20 @@ function Login() {
     <Container maxWidth="xs">
       <div className="login">
         <img src={logo} alt="Campfire" width="100" className="login__logo" />
-        <Alert severity="warning" style={{width: "100%", marginBottom: 10}}>
+        <Alert severity="warning">
           <AlertTitle>Важный дисклеймер</AlertTitle>
           Не хочу напугать, но чтобы не было недопониманий я скажу, что
           все запросы к серверам Campfire идут через мой прокси, потому
           что прямое подключение невозможно. Этот прокси не перехватывает
           запросы, он их даже никак не перепаковывает. Чтобы вы в этом
           были уверены, вы можете просмотреть&nbsp;
-          <Link href="https://github.com/timas130/campweb">исходный код</Link> и
+          <Link href="https://github.com/timas130/campweb" target="_blank">исходный код</Link> и
           самостоятельно запустить прокси и собрать клиентскую часть.
+        </Alert>
+        <Alert severity="info" style={{width: "100%", marginTop: 5, marginBottom: 10}}>
+          Так как прокси работает на бесплатном хосте (Heroku), соединение
+          может быть долгое. Если грузит дольше 30 секунд — перезагрузите
+          страницу.
         </Alert>
 
         {error && <Alert severity="error" style={{width: "100%", marginBottom: 10}}>

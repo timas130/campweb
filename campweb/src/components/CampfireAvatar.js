@@ -49,9 +49,13 @@ function CampfireAvatar(props) {
       style={props.style}
     >
       <Avatar variant={theme.avatarVariant} alt={props.account["J_NAME"]}>
-        <CampfireImage style={{
-          width: "100%"
-        }} id={props.account["J_IMAGE_ID"]} />
+        <CampfireImage 
+          style={{
+            width: "100%"
+          }}
+          id={props.account["J_IMAGE_ID"]}
+          backdrop={props.backdrop}
+        />
       </Avatar>
     </Badge>
   );
