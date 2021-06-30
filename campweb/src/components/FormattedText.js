@@ -168,8 +168,8 @@ function FormattedText(props) {
   let isBold = false, isItalic = false,
       isUnderlined = false, isStriked = false,
       colorPart = 0, linkPart = 0,
-      isCancel = false;
-  let colorBuf = "", linkText = "", linkHref = "";
+      isCancel = false, isMention = false;
+  let colorBuf = "", linkText = "", linkHref = "", mentionBuf = "";
   let result = "", text = encode(props.text).replace(/&#10;/g, "<br />");
 
   for (let i = 0; i < text.length; i++) {
@@ -196,7 +196,7 @@ function FormattedText(props) {
         result += "</span>";
         isItalic = false;
       }
-    } else if (c === "_") {
+    } else if (c === "_" && !isMention && linkPart !== 2) {
       if (! isUnderlined) {
         result += "<span class=\"fmt__underlined\">";
         isUnderlined = true;
@@ -221,7 +221,7 @@ function FormattedText(props) {
       linkPart = 1;
     } else if (c === "]" && linkPart === 1) {
       linkPart = 2;
-    } else if (c === " " && linkPart === 2) {
+    } else if ((c === " " || c === ".") && linkPart === 2) {
       let br = false;
       if (linkHref.endsWith("<br")) {
         linkHref = linkHref.slice(0, linkHref.length - 3);
@@ -232,8 +232,20 @@ function FormattedText(props) {
       linkPart = 0;
       linkHref = "";
       linkText = "";
+    } else if ((c === " " || c === ".") && isMention) {
+      let br = false;
+      if (mentionBuf.endsWith("<br")) {
+        mentionBuf = mentionBuf.slice(0, mentionBuf.length - 3);
+        br = true;
+      }
+      result += "<a class=\"" + linkClass + "\" href=\"/resolve/" + mentionBuf + "\">@" + mentionBuf + "</a> ";
+      if (br) result += "<br";
+      isMention = false;
+      mentionBuf = "";
     } else if (c === "\\") {
       isCancel = true;
+    } else if ((c === "@" || c === "#") && text.charAt(i - 1) !== "&") {
+      isMention = true;
     } else {
       if (colorPart === 1) {
         if (c === " ") {
@@ -255,6 +267,8 @@ function FormattedText(props) {
         linkText += c;
       } else if (linkPart === 2) {
         linkHref += c;
+      } else if (isMention) {
+        mentionBuf += c;
       } else {
         result += c;
       }
@@ -264,6 +278,8 @@ function FormattedText(props) {
   if (linkPart === 2) {
     result += "<a class=\"" + linkClass + "\" href=\"" + linkHref + "\" target=\"_blank\">" + linkText + "</a>";
     linkPart = 0;
+  } else if (isMention) {
+    result += "<a class=\"" + linkClass + "\" href=\"/resolve/" + mentionBuf + "\">@" + mentionBuf + "</a>";
   }
   return (
     <span className="fmt" dangerouslySetInnerHTML={{ __html: result }}></span>
