@@ -4,7 +4,11 @@ import CampfireImage from "./CampfireImage";
 function Tag(props) {
   return (
     <Chip
-      style={{margin: props.main ? "2px 0 2px 10px" : "2px 0 2px 2px"}}
+      style={{
+        margin: props.main ?
+          (props.index === 0 ? "2px 0 2px 0" : "2px 0 2px 10px") :
+          "2px 0 2px 2px"
+      }}
       variant={props.main ? "default" : "outlined"}
 
       label={props.jsonDB["J_NAME"]}
@@ -20,8 +24,8 @@ function Tags(props) {
     <div>
       {props.tags
         .filter(tag => tag.parentUnitId === 0)
-        .map(tag => <>
-          <Tag main key={tag.id} jsonDB={JSON.parse(tag.jsonDB)} />
+        .map((tag, idx) => <>
+          <Tag main index={idx} key={tag.id} jsonDB={JSON.parse(tag.jsonDB)} />
           {props.tags
             .filter(childTag => childTag.parentUnitId === tag.id)
             .map(childTag => <Tag key={childTag.id} jsonDB={JSON.parse(childTag.jsonDB)} />)}

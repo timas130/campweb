@@ -164,6 +164,8 @@ function isHexChars(color) {
   return true;
 }
 
+const stopSymbols = [" ", ".", ","];
+
 function FormattedText(props) {
   let isBold = false, isItalic = false,
       isUnderlined = false, isStriked = false,
@@ -221,24 +223,24 @@ function FormattedText(props) {
       linkPart = 1;
     } else if (c === "]" && linkPart === 1) {
       linkPart = 2;
-    } else if ((c === " " || c === ".") && linkPart === 2) {
+    } else if (stopSymbols.includes(c) && linkPart === 2) {
       let br = false;
       if (linkHref.endsWith("<br")) {
         linkHref = linkHref.slice(0, linkHref.length - 3);
         br = true;
       }
-      result += "<a class=\"" + linkClass + "\" href=\"" + linkHref + "\" target=\"_blank\">" + linkText + "</a> ";
+      result += "<a class=\"" + linkClass + "\" href=\"" + linkHref + "\" target=\"_blank\">" + linkText + "</a>" + c;
       if (br) result += "<br";
       linkPart = 0;
       linkHref = "";
       linkText = "";
-    } else if ((c === " " || c === ".") && isMention) {
+    } else if (stopSymbols.includes(c) && isMention) {
       let br = false;
       if (mentionBuf.endsWith("<br")) {
         mentionBuf = mentionBuf.slice(0, mentionBuf.length - 3);
         br = true;
       }
-      result += "<a class=\"" + linkClass + "\" href=\"/resolve/" + mentionBuf + "\">@" + mentionBuf + "</a> ";
+      result += "<a class=\"" + linkClass + "\" href=\"/resolve/" + mentionBuf + "\">@" + mentionBuf + "</a>" + c;
       if (br) result += "<br";
       isMention = false;
       mentionBuf = "";

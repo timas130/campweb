@@ -69,6 +69,8 @@ function Comment(props) {
   const [voted, setVoted] = useState(0);
   const apiClient = useContext(ApiContext);
 
+  const myComment = props.comment.creator["J_ID"] === apiClient.loginInfo.account["J_ID"];
+
   let quoteText = jsonDB.quoteText;
   if (jsonDB.quoteText.length !== 0 &&
       jsonDB.quoteCreatorName.length !== 0 &&
@@ -117,14 +119,14 @@ function Comment(props) {
         <Box display="flex" flexDirection="column">
           <IconButton
             size="small" onClick={() => addKarma(true)}
-            disabled={!! (props.comment.myKarma || voted)}
+            disabled={!! (myComment || props.comment.myKarma || voted)}
           >
             <ArrowUpward />
           </IconButton>
           <Karma amount={props.comment.karmaCount + voted} />
           <IconButton
             size="small" onClick={() => addKarma(false)}
-            disabled={!! (props.comment.myKarma || voted)}
+            disabled={!! (myComment || props.comment.myKarma || voted)}
           >
             <ArrowDownward />
           </IconButton>

@@ -23,6 +23,8 @@ function PostCard(props) {
   const apiClient = useContext(ApiContext);
   const history = useHistory();
 
+  const myPost = props.post.creator["J_ID"] === apiClient.loginInfo.account["J_ID"];
+
   const addKarma = async (up) => {
     // TODO: anonymous voting
     const resp = await apiClient.makeRequest(new RPublicationsKarmaAdd(
@@ -97,14 +99,14 @@ function PostCard(props) {
         </Button>
         <IconButton
           size="small" onClick={() => addKarma(false)}
-          disabled={!! (props.post.myKarma || voted)}
+          disabled={!! (myPost || props.post.myKarma || voted)}
         >
           <ArrowDownward htmlColor={props.post.myKarma < 0 ? theme.palette.success.main : null } />
         </IconButton>
         <Karma amount={props.post.karmaCount + voted} />
         <IconButton
           size="small" onClick={() => addKarma(true)}
-          disabled={!! (props.post.myKarma || voted)}
+          disabled={!! (myPost || props.post.myKarma || voted)}
         >
           <ArrowUpward htmlColor={props.post.myKarma > 0 ? theme.palette.success.main : null } />
         </IconButton>
