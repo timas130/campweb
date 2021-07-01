@@ -1,9 +1,9 @@
-use std::{env, io::{Read, Write}, net::{TcpListener, TcpStream}, sync::Arc, thread::spawn, vec};
+use std::{env, io::{Read, Write}, net::TcpStream, str::FromStr, sync::Arc, thread::spawn, vec};
 
 use byteorder::{BigEndian, ReadBytesExt, WriteBytesExt};
 use rustls::{ClientSession, ServerCertVerified};
-use tungstenite::{Message, accept};
 use webpki::DNSNameRef;
+use tiny_http::{Header, Method, Response, Server, StatusCode};
 
 pub const IP: &str = "46.254.16.245";
 pub const CERT_ADDR: &str = "46.254.16.245:4027";
@@ -45,61 +45,72 @@ pub fn create_tcpstream_media() -> TcpStream {
     TcpStream::connect(MEDIA_ADDR).unwrap()
 }
 
+macro_rules! http_unwrap {
+    ($r:expr, $req:expr) => {
+        if let Ok(x) = $r {
+            x
+        } else {
+            let error_msg = format!("{{\"__proxy_error__\": \"Something went wrong.\"}}");
+
+            let result = $req.respond(
+                Response::from_string(error_msg)
+            );
+            if let Err(_) = result {
+                println!("[srv] disconnected incorrectly");
+            };
+            return;
+        }
+    };
+}
+
 fn main() {
-    let server = TcpListener::bind(
+    let server = Server::http(
         format!("0.0.0.0:{}", env::var("PORT").unwrap_or_else(|_| "8080".to_string()))
-    ).expect("failed to bind");
-    for stream in server.incoming() {
+    ).expect("failed to start server");
+    for mut request in server.incoming_requests() {
         spawn(move || {
-            println!("[ws ] new connection");
-            let mut ws = accept(stream.unwrap()).unwrap();
-            loop {
-                let msg = ws.read_message().unwrap();
-                if let Ok(s) = msg.to_text() {
-                    let media_req = s.starts_with(MEDIA_PREFIX);
-                    if media_req {
-                        println!("[fwd] recieved media request");
-                    }
 
-                    // connect
-                    let mut sess = create_session();
-                    let mut sock = if media_req {
-                        create_tcpstream_media()
-                    } else {
-                        create_tcpstream()
-                    };
-                    let mut tls = rustls::Stream::new(
-                        &mut sess, &mut sock
-                    );
-                    
-                    // send
-                    let b = if media_req {
-                        &s.as_bytes()[MEDIA_PREFIX.len()..]
-                    } else {
-                        s.as_bytes()
-                    };
-                    println!("[fwd] request length: {}B", b.len());
-                    tls.write_u32::<BigEndian>(b.len() as u32).unwrap();
-                    tls.write_all(b).unwrap();
+        // check and prepare
+        if request.body_length().unwrap_or(5242880) >= 5242880 { // 5 MiB
+            println!("[srv] type=dropping");
+            return;
+        }
+        let reader = request.as_reader();
+        let mut req = String::new();
+        http_unwrap!(reader.read_to_string(&mut req), request);
+        let media_req = req.starts_with(MEDIA_PREFIX);
 
-                    // read
-                    let len = tls.read_u32::<BigEndian>().unwrap();
-                    println!("[fwd] response length: {}B", len);
-                    let mut v = vec![0u8; len as usize];
-                    tls.read_exact(&mut v).unwrap();
+        // connect
+        let mut sess = create_session();
+        let mut sock = if media_req {
+            create_tcpstream_media()
+        } else { create_tcpstream() };
+        let mut tls = rustls::Stream::new(&mut sess, &mut sock);
 
-                    // forward
-                    if media_req {
-                        ws.write_message(Message::Binary(v)).unwrap();
-                    } else {
-                        ws.write_message(Message::Text(
-                            String::from_utf8(v).unwrap()
-                        )).unwrap();
-                    }
-                } else {
-                    ws.write_message(Message::Text("{\"__proxy_error__\": \"non_text\"}".to_string())).unwrap();
-                }
-            }
+        // send
+        let b = if media_req {
+            &req.as_bytes()[MEDIA_PREFIX.len()..]
+        } else { req.as_bytes() };
+        println!("[fwd] type=request length={}", b.len());
+        http_unwrap!(tls.write_u32::<BigEndian>(b.len() as u32), request);
+        http_unwrap!(tls.write_all(b), request);
+
+        // read
+        let len = http_unwrap!(tls.read_u32::<BigEndian>(), request);
+        let mut resp = vec![0u8; len as usize];
+        http_unwrap!(tls.read_exact(&mut resp), request);
+        println!("[fwd] type=response length={}", len);
+
+        // forward
+        let result = request.respond({
+            let mut resp = Response::from_data(resp);
+            resp.add_header(Header::from_str("Access-Control-Allow-Origin: *").unwrap());
+            resp
+        });
+        if let Err(_) = result {
+            println!("[srv] type=disconnected incorrectly");
+        }
+        
         });
     }
 }

@@ -9,53 +9,17 @@ export const protoadmins = [1];
 
 export const proxyAddr =
   process.env.NODE_ENV === "production" ?
-  "wss://campweb-proxy.herokuapp.com/" :
-  "ws://192.168.1.104:8080/";
-
-function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
+  "https://campweb-proxy.herokuapp.com/" :
+  "http://192.168.1.104:8080/";
 
 export class ApiClient {
   constructor() {
-    let lockResolve;
-    this.endPromise = new Promise((resolve, reject) => {
-      lockResolve = () => {
-        this.endPromise = null;
-        resolve();
-      };
-    });
-    this.queue = [];
-
-    this.ws = new WebSocket(proxyAddr);
-    this.ws.onclose = () => this.reconnect();
-    this.ws.onerror = () => this.reconnect();
-    this.ws.onopen = lockResolve;
-
     this.loginToken = window.localStorage.getItem("loginToken") || "";
     this.accessToken = "";
     this.loginInfo = null;
 
     this.onUnauthorized = null;
     this.onError = null;
-  }
-
-  reconnect() {
-    this.ws.close();
-    this.ws = new WebSocket(proxyAddr);
-    this.ws.onerror = () => {
-      console.error("failed to reconnect");
-      this.onError && this.onError("Failed to reconnect to the server");
-    };
-    this.ws.onclose = () => {
-      console.error("failed to reconnect");
-      this.onError && this.onError("Failed to reconnect to the server");
-    };
-    setTimeout(() => {
-      this.ws.onclose = () => this.reconnect();
-      this.ws.onerror = () => this.reconnect();
-      console.log("reconnected (probably lol)");
-    }, 1000);
   }
 
   setLoginTokenEmail(email, password) {
@@ -70,8 +34,6 @@ export class ApiClient {
   }
 
   makeRequest(req) {
-    console.log(`[${req["J_REQUEST_NAME"]}] start token=${!!this.accessToken}`);
-
     // prepare
     req["J_REQUEST_DATE"] = new Date().getTime() * 1000000;
     if (this.loginToken && !req["__media__"]) req["J_API_LOGIN_TOKEN"] = this.loginToken;
@@ -81,59 +43,36 @@ export class ApiClient {
     req["requestProjectKey"] = projectKey;
 
     // send
-    return new Promise(async (resolve, rejectInner) => {
-      const reject = (function (e) {
-        this.onError && this.onError(e);
-        rejectInner(e);
-      }).bind(this);
-
-      // add to queue
-      let id = Math.max(...this.queue);
-      if (id === -Infinity) id = 0;
-      id++;
-      this.queue.push(id);
-
-      // wait
-      console.log(`[${req["J_REQUEST_NAME"]}] queue id ${id}, waiting`);
-      while (this.queue[0] !== id || this.endPromise) {
-        this.endPromise && await this.endPromise;
-        await sleep(50);
+    return new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.open("POST", proxyAddr, true);
+      let payload;
+      if (req["__media__"]) {
+        payload = "__proxy__(media):" + JSON.stringify(req);
+      } else {
+        payload = JSON.stringify(req);
+      }
+      if (req["__type__"] === "binary") {
+        xhr.responseType = "blob";
       }
 
-      // leave queue
-      this.queue.shift();
-      console.log(`[${req["J_REQUEST_NAME"]}] queue id ${id}, starting request`);
-
-      let lockResolve;
-      this.endPromise = new Promise((resolve, reject) => {
-        lockResolve = () => {
-          this.endPromise = null;
-          resolve();
-        };
-      });
-
-      this.ws.onmessage = (ev) => {
-        this.ws.onmessage = undefined;
-        this.ws.onclose = () => this.reconnect();
-        this.ws.onerror = () => this.reconnect();
+      xhr.onload = () => {
+        console.log(`[${req["J_REQUEST_NAME"]}] got response`);
 
         if (req["__type__"] === "binary") {
-          resolve(ev.data);
-          lockResolve();
+          resolve(xhr.response);
           return;
         }
 
         let data;
         try {
-          data = JSON.parse(ev.data)
+          data = JSON.parse(xhr.responseText)
         } catch (e) {
           reject("Failed to parse response");
-          lockResolve();
           return;
         }
         if (data["__proxy_error__"]) {
           reject("Proxy error: " + data["__proxy_error__"]);
-          lockResolve();
           return;
         }
         if (data["J_API_ACCESS_TOKEN"]) {
@@ -150,30 +89,13 @@ export class ApiClient {
             this.onUnauthorized && this.onUnauthorized();
           }
         }
-        lockResolve();
       };
-      this.ws.onclose = (ev) => {
-        reject("Server closed connection, reconnecting");
-        lockResolve();
-        this.reconnect();
-      };
-      this.ws.onerror = (ev) => {
-        reject("WebSocket error, reconnecting");
-        lockResolve();
-        this.reconnect();
+      xhr.onerror = (ev) => {
+        reject("Request error");
       };
 
-      let payload;
-      if (req["__media__"]) {
-        payload = "__proxy__(media):" + JSON.stringify(req);
-      } else {
-        payload = JSON.stringify(req);
-      }
-      
-      console.log(`[${req["J_REQUEST_NAME"]}] queue id ${id}, sending request`);
-      if (process.env.NODE_ENV === "development")
-        console.log(payload.replace(this.accessToken, "...").replace(this.loginToken, "..."));
-      this.ws.send(payload);
+      console.log(`[${req["J_REQUEST_NAME"]}] sending token_present=${!!this.accessToken}`);
+      xhr.send(payload);
     });
   }
 }
