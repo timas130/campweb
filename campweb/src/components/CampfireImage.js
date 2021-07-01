@@ -10,7 +10,23 @@ function CampfireImage(props) {
   const apiClient = useContext(ApiContext);
 
   async function loadImage() {
-    const response = await apiClient.makeRequest(new RResourcesGet(props.id));
+    let response;
+    if (window.caches) {
+      const cache = (await window.caches.open("resources"));
+      const addr = "/_resources_cache/" + props.id.toString();
+      let match = await cache.match(addr);
+      if (! match) {
+        console.log("[CampfireImage] no cache record, fetching " + props.id);
+        response = await apiClient.makeRequest(new RResourcesGet(props.id));
+        cache.put(addr, new Response(response, {status: 200, statusText: "OK"}));
+      } else {
+        response = await match.blob();
+        console.log("[CampfireImage] found cache record for resource " + props.id);
+      }
+    } else {
+      console.log("[CampfireImage] cache not supported, fetching " + props.id);
+      response = await apiClient.makeRequest(new RResourcesGet(props.id));
+    }
     setImage(URL.createObjectURL(response));
   }
 
