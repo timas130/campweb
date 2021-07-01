@@ -1,6 +1,6 @@
 import { Card, CardHeader, CardContent, CardActions, Avatar, Link, Collapse, Button, IconButton } from "@material-ui/core";
 import CampfireImage from "./CampfireImage";
-import Page from "./pages/Page";
+import Pages from "./pages/Pages";
 import moment from "moment";
 import "moment/locale/ru";
 import { useContext, useState } from "react";
@@ -75,9 +75,7 @@ function PostCard(props) {
       />
       <CardContent>
         <Collapse collapsedHeight={250} in={expanded}>
-          {pages.map((page, idx) => (
-            <Page page={page} key={idx} />
-          ))}
+          <Pages pages={pages} />
           {
             props.post.userActivity && 
             <UserActivity activity={props.post.userActivity} />
