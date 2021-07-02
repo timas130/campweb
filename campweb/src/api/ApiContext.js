@@ -33,6 +33,14 @@ export class ApiClient {
     this.onUnauthorized = onUnauthorized;
   }
 
+  translate(id) {
+    let idx = this.loginInfo.translate_map_k.indexOf(id);
+    if (idx === -1) return id;
+    else {
+      return this.loginInfo.translate_map_v[idx].text;
+    }
+  }
+
   makeRequest(req) {
     // prepare
     req["J_REQUEST_DATE"] = new Date().getTime() * 1000000;
@@ -81,6 +89,8 @@ export class ApiClient {
         if (data["J_STATUS"] === "J_STATUS_OK") {
           if (req["J_REQUEST_NAME"] === "RAccountsLogin") {
             this.loginInfo = data["J_RESPONSE"];
+            this.loginInfo.translate_map_k = JSON.parse(this.loginInfo.translate_map_k);
+            this.loginInfo.translate_map_v = JSON.parse(this.loginInfo.translate_map_v);
           }
           resolve(data["J_RESPONSE"] || {});
         } else {

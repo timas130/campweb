@@ -6,6 +6,7 @@ import PageVideo from "./PageVideo";
 import PageQuote from "./PageQuote";
 import PageLink from "./PageLink";
 import API from "../../api/api.json";
+import PagePoll from "./PagePoll";
 
 function Page(props) {
   switch (props.page["J_PAGE_TYPE"]) {
@@ -21,6 +22,8 @@ function Page(props) {
       return (<div className="page"><PageQuote page={props.page} /></div>);
     case API["PAGE_TYPE_VIDEO"]:
       return (<div className="page"><PageVideo page={props.page} /></div>);
+    case API["PAGE_TYPE_POLLING"]:
+      return (<div className="page"><PagePoll sourceId={props.sourceId} page={props.page} /></div>);
     default:
       return (<div className="page">
         Error: unknown page type: {

@@ -3,6 +3,7 @@ import { theme } from "../App";
 import CampfireImage from "./CampfireImage";
 import { protoadmins } from "../api/ApiContext";
 import { blue, green, grey, orange, red } from "@material-ui/core/colors";
+import { useHistory } from "react-router";
 
 const SmallAvatar = withStyles((theme) => ({
   root: {
@@ -28,10 +29,12 @@ function badgeColorForAccount(account) {
 
 function CampfireAvatar(props) {
   const badgeBG = badgeColorForAccount(props.account);
+  const history = useHistory();
 
   // TODO: sponsor particles
   return (
     <Badge
+      onClick={() => history.push("/account/" + props.account["J_ID"])}
       overlap="circle"
       anchorOrigin={{
         vertical: "bottom", horizontal: "right"
@@ -46,7 +49,10 @@ function CampfireAvatar(props) {
         </SmallAvatar>
       }
       className={props.className}
-      style={props.style}
+      style={{
+        cursor: "pointer",
+        ...props.style
+      }}
     >
       <Avatar variant={theme.avatarVariant} alt={props.account["J_NAME"]}>
         <CampfireImage 

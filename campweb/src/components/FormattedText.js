@@ -154,6 +154,8 @@ const colors = [
   "Yellow",
   "YellowGreen",
 ].map(v => v.toLowerCase());
+const customColors = ["rainbow", "campfire", "christmas", "gay"];
+
 const linkClass = "MuiTypography-root MuiLink-root MuiLink-underlineHover MuiTypography-colorPrimary";
 
 function isHexChars(color) {
@@ -164,7 +166,7 @@ function isHexChars(color) {
   return true;
 }
 
-const stopSymbols = [" ", ".", ","];
+const stopSymbols = [" ", ","];
 
 function FormattedText(props) {
   let isBold = false, isItalic = false,
@@ -253,13 +255,17 @@ function FormattedText(props) {
         if (c === " ") {
           colorPart = 2;
           colorBuf = colorBuf.toLowerCase();
-          if (! colors.includes(colorBuf)) {
+          if (! colors.includes(colorBuf) && ! customColors.includes(colorBuf)) {
             if (colorBuf.length !== 6 || !isHexChars(colorBuf)) {
               colorBuf = "ffffff";
             }
             colorBuf = "#" + colorBuf;
           }
-          result += "<span style=\"color: " + colorBuf + ";\">";
+          if (customColors.includes(colorBuf)) {
+            result += `<span class="fmt__color-${colorBuf}">`;
+          } else {
+            result += `<span style="color: ${colorBuf};">`;
+          }
           colorPart = 2;
           colorBuf = "";
         } else {
@@ -284,7 +290,7 @@ function FormattedText(props) {
     result += "<a class=\"" + linkClass + "\" href=\"/resolve/" + mentionBuf + "\">@" + mentionBuf + "</a>";
   }
   return (
-    <span className="fmt" dangerouslySetInnerHTML={{ __html: result }}></span>
+    <span className="fmt" dangerouslySetInnerHTML={{ __html: result }} />
   );
 }
 

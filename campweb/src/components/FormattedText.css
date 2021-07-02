@@ -1,3 +1,7 @@
+.fmt {
+  overflow-wrap: anywhere;
+}
+
 .fmt__bold {
   font-weight: bold;
 }
@@ -9,4 +13,31 @@
 }
 .fmt__striked {
   text-decoration: line-through;
+}
+
+.fmt__color-campfire {
+  color: #ff6c01;
+}
+.fmt__color-rainbow {
+  background: linear-gradient(90deg, 
+    red 14%, orange 28%, yellow 32%, 
+    lime 46%, lightblue 60%, aqua 74%, 
+    magenta 100%);
+  background-clip: text;
+  color: transparent;
+}
+.fmt__color-christmas {
+  background: linear-gradient(90deg, white 0%,
+    red 10%, white 20%, red 30%, white 40%,
+    red 50%, white 60%, red 70%, white 80%,
+    red 90%, white 100%);
+  background-clip: text;
+  color: transparent;
+}
+.fmt__color-gay {
+  background: linear-gradient(90deg, 
+    red 14%, orange 28%, yellow 32%, 
+    lime 46%, lightblue 60%, magenta 100%);
+  background-clip: text;
+  color: transparent;
 }

@@ -45,7 +45,6 @@ function CampfireImage(props) {
       position: "relative",
       width: "100%",
       height: 100,
-      minHeight: props.minHeight,
       ...props.style
     }} onChange={(inView) => inView && loadImage()}>
       <CircularProgress style={{

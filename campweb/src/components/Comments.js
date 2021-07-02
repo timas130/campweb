@@ -50,7 +50,7 @@ function Comments(props) {
 
   return (
     <div>
-      <Box display="flex" padding="16px">
+      <Box display="flex" marginTop="16px">
         <TextField
           label="Сообщение" multiline
           style={{flexGrow: 1, marginRight: 5}}

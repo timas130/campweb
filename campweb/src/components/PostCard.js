@@ -77,7 +77,7 @@ function PostCard(props) {
       />
       <CardContent>
         <Collapse collapsedHeight={250} in={expanded}>
-          <Pages pages={pages} />
+          <Pages pages={pages} sourceId={props.post.id} />
           {
             props.post.userActivity && 
             <UserActivity activity={props.post.userActivity} />

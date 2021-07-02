@@ -29,7 +29,7 @@ const ListItemTextOverflowable = withStyles({
   }
 })(ListItemText);
 
-function Account(props) {
+function Profile() {
   const { accountId } = useParams();
   const history = useHistory();
   const apiClient = useContext(ApiContext);
@@ -142,14 +142,14 @@ function Account(props) {
           <Card style={{marginBottom: 10}}>
             <CardContent style={{padding: 16}}>
               <Typography variant="body1" align="center">
-                <FormattedText text={profile.status} />
+                <FormattedText text={profile.status || "Hello, world!"} />
               </Typography>
             </CardContent>
           </Card>
           {/* Actions/information */}
           <Paper style={{marginBottom: 10}}>
             <List>
-              <ListItem button>
+              <ListItem button onClick={() => history.push(`/account/${account["J_ID"]}/karma`)}>
                 <ListItemIcon><Star /></ListItemIcon>
                 <ListItemText
                   primary="Карма"
@@ -165,7 +165,7 @@ function Account(props) {
                   </>}
                 />
               </ListItem>
-              <ListItem button>
+              <ListItem button onClick={() => history.push(`/account/${account["J_ID"]}/achievements`)}>
                 <ListItemIcon><Star /></ListItemIcon>
                 <ListItemText
                   primary="Достижения"
@@ -254,9 +254,8 @@ function Account(props) {
               {JSON.parse(profile.links.links)
                 .map((link, idx) => (
                   link.url ?
-                  <ListItem button
-                    onClick={() => window.open(link.url, "_blank")}
-                  >
+                  <ListItem button key={idx}
+                    onClick={() => window.open(link.url, "_blank")}>
                     <ListItemTextOverflowable
                       primary={link.title}
                       secondary={link.url}
@@ -272,7 +271,7 @@ function Account(props) {
             if (pub.unitType === API["PUBLICATION_TYPE_POST"]) {
               return <PostCard key={pub.id} post={pub} />;
             } else if (pub.unitType === API["PUBLICATION_TYPE_COMMENT"]) {
-              return <Comment key={pub.id} comment={pub} />;
+              return <Comment fandomAvatar key={pub.id} comment={pub} />;
             } else {
               return "";
             }
@@ -300,4 +299,4 @@ function Account(props) {
   );
 }
 
-export default Account;
+export default Profile;

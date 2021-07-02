@@ -10,7 +10,7 @@ function Karma(props) {
       fontWeight: "bold",
       textAlign: "center"
     }}>
-      {(props.amount) / 100}
+      {((props.amount) / 100).toFixed()}
     </span>
   );
 }

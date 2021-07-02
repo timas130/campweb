@@ -1,4 +1,4 @@
-import { ListItem, ListItemAvatar, ListItemText, Typography, ListItemSecondaryAction, Box, IconButton, Paper } from "@material-ui/core";
+import { ListItem, ListItemAvatar, ListItemText, Typography, ListItemSecondaryAction, Box, IconButton, Paper, Avatar, Link } from "@material-ui/core";
 import CampfireImage from "./CampfireImage";
 import React, { useContext, useState } from "react";
 import moment from "moment";
@@ -9,6 +9,8 @@ import PageImages from "./pages/PageImages";
 import { ApiContext } from "../api/ApiContext";
 import RPublicationsKarmaAdd from "../api/requests/post/RPublicationsKarmaAdd";
 import CampfireAvatar from "./CampfireAvatar";
+import { useHistory } from "react-router";
+import { Link as RouterLink } from "react-router-dom";
 
 function CommentQuote(props) {
   return (
@@ -68,13 +70,14 @@ function Comment(props) {
   const jsonDB = JSON.parse(props.comment.jsonDB);
   const [voted, setVoted] = useState(0);
   const apiClient = useContext(ApiContext);
+  const history = useHistory();
 
   const myComment = props.comment.creator["J_ID"] === apiClient.loginInfo.account["J_ID"];
 
   let quoteText = jsonDB.quoteText;
-  if (jsonDB.quoteText.length !== 0 &&
+  if (quoteText && quoteText.length !== 0 &&
       jsonDB.quoteCreatorName.length !== 0 &&
-      jsonDB.quoteText.startsWith(jsonDB.quoteCreatorName + ": ")) {
+      quoteText.startsWith(jsonDB.quoteCreatorName + ": ")) {
     quoteText = quoteText.slice((jsonDB.quoteCreatorName + ": ").length, quoteText.length);
   }
 
@@ -90,7 +93,14 @@ function Comment(props) {
     <ListItem alignItems="flex-start">
       <ListItemAvatar>
         <React.Fragment>
-          <CampfireAvatar account={props.comment.creator} /><br />
+          {
+            !props.fandomAvatar ?
+            <><CampfireAvatar account={props.comment.creator} /><br /></> :
+            <Avatar onClick={() => history.push("/fandom/" + props.comment.fandom.id)}>
+              <CampfireImage style={{width: "100%"}}
+                id={props.comment.fandom.imageId} />
+            </Avatar>
+          }
           <IconButton size="small" style={{
             marginTop: 5,
             marginLeft: 5,
@@ -101,7 +111,13 @@ function Comment(props) {
         </React.Fragment>
       </ListItemAvatar>
       <ListItemText
-        primary={props.comment.creator["J_NAME"]}
+        primary={
+          !props.fandomAvatar ?
+          <Link component={RouterLink} to={`/account/${props.comment.creator["J_ID"]}`} color="textPrimary">
+            {props.comment.creator["J_NAME"]}
+          </Link> :
+          props.comment.fandom.name
+        }
         secondaryTypographyProps={{component: "div"}}
         secondary={
           <React.Fragment>

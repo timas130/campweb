@@ -8,7 +8,9 @@ import { useEffect, useState } from 'react';
 import { Alert } from '@material-ui/lab';
 import Post from "./pages/Post";
 import AppToolbar from './components/AppToolbar';
-import Account from './pages/Profile';
+import Profile from './pages/Profile';
+import ProfileKarma from './pages/profile/Karma';
+import Achievements from './pages/profile/Achievements';
 
 export const theme = createMuiTheme({
   palette: {
@@ -62,7 +64,12 @@ export const useLoggedIn = (history, apiClient) => {
       });
     }
   });
-}
+};
+export const useScrollToTop = () => {
+  useEffect(() => {
+    window.scroll(0, 0);
+  }, []);
+};
 
 function App() {
   const history = useHistory();
@@ -100,7 +107,10 @@ function App() {
               <Route path="/login"><Login /></Route>
               <Route path="/feed"><Feed /></Route>
               <Route path="/post/:postId"><Post /></Route>
-              <Route path="/account/:accountId" exact><Account /></Route>
+
+              <Route path="/account/:accountId" exact><Profile /></Route>
+              <Route path="/account/:accountId/karma" exact><ProfileKarma /></Route>
+              <Route path="/account/:accountId/achievements" exact><Achievements /></Route>
             </Switch>
           </Box>
           <Snackbar open={!!error} autoHideDuration={5000} onClose={closeSnackbar}>
