@@ -166,7 +166,8 @@ function isHexChars(color) {
   return true;
 }
 
-const stopSymbols = [" ", ","];
+const stopSymbols = [" ", ",", "!"];
+const mentionStopSymbols = [" ", ",", "&", "!", "?"];
 
 function FormattedText(props) {
   let isBold = false, isItalic = false,
@@ -236,7 +237,7 @@ function FormattedText(props) {
       linkPart = 0;
       linkHref = "";
       linkText = "";
-    } else if (stopSymbols.includes(c) && isMention) {
+    } else if (mentionStopSymbols.includes(c) && isMention) {
       let br = false;
       if (mentionBuf.endsWith("<br")) {
         mentionBuf = mentionBuf.slice(0, mentionBuf.length - 3);
@@ -285,7 +286,6 @@ function FormattedText(props) {
 
   if (linkPart === 2) {
     result += "<a class=\"" + linkClass + "\" href=\"" + linkHref + "\" target=\"_blank\">" + linkText + "</a>";
-    linkPart = 0;
   } else if (isMention) {
     result += "<a class=\"" + linkClass + "\" href=\"/resolve/" + mentionBuf + "\">@" + mentionBuf + "</a>";
   }
