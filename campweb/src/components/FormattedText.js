@@ -167,7 +167,7 @@ function isHexChars(color) {
 }
 
 const stopSymbols = [" ", ",", "!"];
-const mentionStopSymbols = [" ", ",", "&", "!", "?"];
+const mentionStopSymbols = [" ", ",", "&", "!", "?", ".", ":", ";", "(", ")"];
 
 function FormattedText(props) {
   let isBold = false, isItalic = false,
