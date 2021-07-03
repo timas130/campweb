@@ -26,6 +26,10 @@ export class ApiClient {
     this.loginToken = `Email - ${email} - ${md5(password)}`;
     window.localStorage.setItem("loginToken", this.loginToken);
   }
+  clearLoginToken() {
+    this.loginToken = "";
+    window.localStorage.setItem("loginToken", "");
+  }
   setAccessToken(token) {
     this.accessToken = token;
   }
