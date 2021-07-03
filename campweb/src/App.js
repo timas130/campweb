@@ -67,7 +67,9 @@ export const useLoggedIn = (history, apiClient) => {
 };
 export const useScrollToTop = () => {
   useEffect(() => {
+    const scrollY = window.scrollY;
     window.scroll(0, 0);
+    return () => window.scroll(0, scrollY);
   }, []);
 };
 
@@ -84,6 +86,10 @@ function App() {
   const closeSnackbar = (ev, reason) => {
     reason !== "clickaway" && setError(null);
   };
+
+  const [posts, setPosts] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [tab, setTab] = useState(0);
 
   return (
     <ThemeProvider theme={theme}>
@@ -105,7 +111,14 @@ function App() {
             <Switch>
               <Route path="/" exact><Redirect to="/login" /></Route>
               <Route path="/login"><Login /></Route>
-              <Route path="/feed"><Feed /></Route>
+              <Route path="/feed">
+                <Feed
+                  posts={posts} setPosts={setPosts}
+                  loading={loading} setLoading={setLoading}
+                  tab={tab} setTab={setTab}
+                />
+              </Route>
+
               <Route path="/post/:postId"><Post /></Route>
 
               <Route path="/account/:accountId" exact><Profile /></Route>

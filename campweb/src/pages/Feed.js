@@ -7,7 +7,7 @@ import InView from "react-intersection-observer";
 import { Alert, AlertTitle } from "@material-ui/lab";
 import RPostFeedGetAllSubscribe from "../api/requests/post/RPostFeedGetAllSubscribe";
 import { useHistory } from "react-router";
-import { useLoggedIn } from "../App";
+import {useLoggedIn, useScrollToTop} from "../App";
 import { version } from "../../package.json";
 
 async function loadMorePosts(apiClient, posts, setPosts, loading, setLoading, tab) {
@@ -38,14 +38,13 @@ async function loadMorePosts(apiClient, posts, setPosts, loading, setLoading, ta
   console.log(response);
   setLoading(false);
 }
-function Feed() {
+function Feed(props) {
   const apiClient = useContext(ApiContext);
-  const [posts, setPosts] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [tab, setTab] = useState(0);
+  const { posts, setPosts, loading, setLoading, tab, setTab } = props;
   const history = useHistory()
 
   useLoggedIn(history, apiClient);
+  useScrollToTop();
   useEffect(() => {
     if (posts.length === 0)
       loadMorePosts(apiClient, posts, setPosts, loading, setLoading, tab);
@@ -66,10 +65,8 @@ function Feed() {
     <Container maxWidth="sm">
       <div style={{paddingTop: 10, paddingBottom: 10}}><Alert severity="error">
         <AlertTitle>Известные баги/что пока не работает:</AlertTitle>
-        1. В свернутом виде посты могут быть больше, чем в развернётом <Link href="/post/3801432">(тест)</Link><br />
-        2. Может потерятся сессия<br />
-        3. Всё, что не нажимается, не работает<br />
-        4. Если зайти в ленту с любой другой страницы, то она сбросится<br />
+        1. В свернутом виде посты могут быть больше, чем в развёрнутом <Link href="/post/3801432">(тест)</Link><br />
+        2. Всё, что не нажимается, не работает<br />
         <Typography variant="caption">
           Версия клиента: {version}
         </Typography>
