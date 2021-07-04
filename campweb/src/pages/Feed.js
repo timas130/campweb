@@ -1,5 +1,5 @@
 import { CircularProgress, Container, Tabs, Tab, Typography, Link } from "@material-ui/core";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect } from "react";
 import { ApiContext } from "../api/ApiContext";
 import PostCard from "../components/PostCard";
 import RPostFeedGetAll from "../api/requests/post/RPostFeedGetAll";
@@ -48,7 +48,7 @@ function Feed(props) {
   useEffect(() => {
     if (posts.length === 0)
       loadMorePosts(apiClient, posts, setPosts, loading, setLoading, tab);
-  }, [apiClient, posts, loading, tab]);
+  }, [apiClient, posts, loading, tab, setLoading, setPosts]);
 
   const onBottom = (inView) => {
     if (inView && !loading) {
