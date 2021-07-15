@@ -3,18 +3,18 @@ import md5 from "md5";
 import API from "./api.json";
 
 export const ApiContext = React.createContext(null);
-export const apiVersion = "1.251";
-export const projectKey = API["PROJECT_KEY_CAMPFIRE"];
+const apiVersion = "1.251";
+const projectKey = API["PROJECT_KEY_CAMPFIRE"];
 export const protoadmins = [1];
 
-export const proxyAddr =
+const proxyAddr =
   process.env.NODE_ENV === "production" ?
   "https://campweb-proxy.herokuapp.com/" :
   "http://192.168.1.104:8080/";
 
 export class ApiClient {
   constructor() {
-    this.loginToken = window.localStorage.getItem("loginToken") || "";
+    this.loginToken = (window.localStorage && window.localStorage.getItem("loginToken")) || "";
     this.accessToken = "";
     this.loginInfo = null;
 
@@ -24,25 +24,17 @@ export class ApiClient {
 
   setLoginTokenEmail(email, password) {
     this.loginToken = `Email - ${email} - ${md5(password)}`;
-    window.localStorage.setItem("loginToken", this.loginToken);
+    window.localStorage && window.localStorage.setItem("loginToken", this.loginToken);
   }
   clearLoginToken() {
     this.loginToken = "";
-    window.localStorage.setItem("loginToken", "");
-  }
-  setAccessToken(token) {
-    this.accessToken = token;
-  }
-  setOnUnauthorized(onUnauthorized) {
-    this.onUnauthorized = onUnauthorized;
+    window.localStorage && window.localStorage.setItem("loginToken", "");
   }
 
   translate(id) {
     let idx = this.loginInfo.translate_map_k.indexOf(id);
     if (idx === -1) return id;
-    else {
-      return this.loginInfo.translate_map_v[idx].text;
-    }
+    else return this.loginInfo.translate_map_v[idx].text;
   }
 
   makeRequest(req) {
@@ -88,7 +80,7 @@ export class ApiClient {
           return;
         }
         if (data["J_API_ACCESS_TOKEN"]) {
-          this.setAccessToken(data["J_API_ACCESS_TOKEN"]);
+          this.accessToken = data["J_API_ACCESS_TOKEN"];
         }
         if (data["J_STATUS"] === "J_STATUS_OK") {
           if (req["J_REQUEST_NAME"] === "RAccountsLogin") {

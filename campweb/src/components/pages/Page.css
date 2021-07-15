@@ -1,3 +1,9 @@
 .page {
   margin: 8px 0;
+  position: relative;
+}
+.page__edit {
+  position: absolute;
+  right: 4px; top: 4px;
+  opacity: .5;
 }

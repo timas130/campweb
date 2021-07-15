@@ -290,7 +290,7 @@ function FormattedText(props) {
     result += "<a class=\"" + linkClass + "\" href=\"/resolve/" + mentionBuf + "\">@" + mentionBuf + "</a>";
   }
   return (
-    <span className="fmt" dangerouslySetInnerHTML={{ __html: result }} />
+    <span className="fmt" style={props.style} dangerouslySetInnerHTML={{ __html: result }} />
   );
 }
 

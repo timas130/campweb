@@ -1,6 +1,6 @@
 import './App.css';
 import { createMuiTheme, ThemeProvider, CssBaseline, Box, Snackbar, AppBar, Toolbar, Slide, useScrollTrigger } from '@material-ui/core';
-import { BrowserRouter as Router, Switch, Route, useHistory, Redirect } from "react-router-dom";
+import {Router, Switch, Route, useHistory, Redirect} from "react-router-dom";
 import Login from "./pages/Login";
 import { ApiClient, ApiContext } from './api/ApiContext';
 import Feed from './pages/Feed';
@@ -11,6 +11,10 @@ import AppToolbar from './components/AppToolbar';
 import Profile from './pages/Profile';
 import ProfileKarma from './pages/profile/Karma';
 import Achievements from './pages/profile/Achievements';
+import Create from "./pages/Create";
+import Settings from "./pages/Settings";
+import {createBrowserHistory} from "history";
+import {wrapHistory} from "oaf-react-router";
 
 export const theme = createMuiTheme({
   palette: {
@@ -36,7 +40,7 @@ export const theme = createMuiTheme({
     }
   }
 }, {
-  avatarVariant: "rounded"
+  avatarVariant: window.localStorage.getItem("avatarVariant") || "rounded"
 });
 
 const client = new ApiClient();
@@ -65,13 +69,12 @@ export const useLoggedIn = (history, apiClient) => {
     }
   });
 };
-export const useScrollToTop = () => {
-  useEffect(() => {
-    const scrollY = window.scrollY;
-    window.scroll(0, 0);
-    return () => window.scroll(0, scrollY);
-  }, []);
-};
+
+const browserHistory = createBrowserHistory();
+wrapHistory(browserHistory, {
+  disableAutoScrollRestoration: false,
+  restorePageStateOnPop: true
+});
 
 function App() {
   const history = useHistory();
@@ -94,7 +97,7 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <ApiContext.Provider value={client}>
-        <Router>
+        <Router history={browserHistory}>
           <HideOnScroll>
             <AppBar color="default" position="fixed">
               <AppToolbar />
@@ -111,6 +114,7 @@ function App() {
             <Switch>
               <Route path="/" exact><Redirect to="/login" /></Route>
               <Route path="/login"><Login /></Route>
+              <Route path="/settings"><Settings /></Route>
               <Route path="/feed">
                 <Feed
                   posts={posts} setPosts={setPosts}
@@ -120,6 +124,7 @@ function App() {
               </Route>
 
               <Route path="/post/:postId"><Post /></Route>
+              <Route path="/drafts/:draftId"><Create /></Route>
 
               <Route path="/account/:accountId" exact><Profile /></Route>
               <Route path="/account/:accountId/karma" exact><ProfileKarma /></Route>

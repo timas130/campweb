@@ -6,7 +6,7 @@ import { ApiContext } from "../api/ApiContext";
 import RPostGet from "../api/requests/post/RPostGet";
 import Comments from "../components/Comments";
 import Tags from "../components/Tags";
-import { useLoggedIn } from "../App";
+import {useLoggedIn} from "../App";
 
 function Post(props) {
   const { postId } = useParams();

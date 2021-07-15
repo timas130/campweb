@@ -5,9 +5,9 @@ function PageImage(props) {
   return (
     <CampfireImage id={props.page["J_IMAGE_ID"]} style={{
       width: "100%",
-      height: "auto"
+      // TODO: reset minimum height after load
+      minHeight: 100
     }} backdrop />
   );
 }
-
 export default PageImage;

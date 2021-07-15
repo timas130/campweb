@@ -5,11 +5,13 @@ import App from './App';
 import * as Sentry from "@sentry/react";
 import {Integrations} from "@sentry/tracing";
 
-Sentry.init({
-  dsn: "https://57cfc8ba87ce454f8ddba4f91773d2f0@o911018.ingest.sentry.io/5846009",
-  integrations: [new Integrations.BrowserTracing()],
-  tracesSampleRate: 0.4
-});
+if (process.env.NODE_ENV === "production") {
+  Sentry.init({
+    dsn: "https://57cfc8ba87ce454f8ddba4f91773d2f0@o911018.ingest.sentry.io/5846009",
+    integrations: [new Integrations.BrowserTracing()],
+    tracesSampleRate: 1
+  });
+}
 
 ReactDOM.render(
   <App />,

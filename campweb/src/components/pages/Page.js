@@ -7,25 +7,42 @@ import PageQuote from "./PageQuote";
 import PageLink from "./PageLink";
 import API from "../../api/api.json";
 import PagePoll from "./PagePoll";
+import {theme} from "../../App";
+import {IconButton} from "@material-ui/core";
+import {Delete, Edit} from "@material-ui/icons";
+import PageSpoiler from "./PageSpoiler";
 
 function Page(props) {
+  let el;
   switch (props.page["J_PAGE_TYPE"]) {
     case API["PAGE_TYPE_TEXT"]:
-      return (<div className="page"><PageText page={props.page} /></div>);
+      el = <PageText page={props.page} />;
+      break;
     case API["PAGE_TYPE_IMAGE"]:
-      return (<div className="page"><PageImage page={props.page} /></div>);
+      el = <PageImage page={props.page} />;
+      break;
     case API["PAGE_TYPE_IMAGES"]:
-      return (<div className="page"><PageImages page={props.page} /></div>);
+      el = <PageImages page={props.page} />;
+      break;
     case API["PAGE_TYPE_LINK"]:
-      return (<div className="page"><PageLink page={props.page} /></div>);
+      el = <PageLink page={props.page} />;
+      break;
     case API["PAGE_TYPE_QUOTE"]:
-      return (<div className="page"><PageQuote page={props.page} /></div>);
+      el = <PageQuote page={props.page} />;
+      break;
     case API["PAGE_TYPE_VIDEO"]:
-      return (<div className="page"><PageVideo page={props.page} /></div>);
+      el = <PageVideo page={props.page} />;
+      break;
     case API["PAGE_TYPE_POLLING"]:
-      return (<div className="page"><PagePoll sourceId={props.sourceId} page={props.page} /></div>);
+      el = <PagePoll sourceId={props.sourceId} page={props.page} />;
+      break;
+    case API["PAGE_TYPE_SPOILER"]:
+      el = <PageSpoiler sourceId={props.sourceId} name={props.page.name}>
+        {props.children}
+      </PageSpoiler>
+      break;
     default:
-      return (<div className="page">
+      return (<div className="page" style={{color: theme.palette.error.main}}>
         Error: unknown page type: {
           Object.keys(API).filter(
             i => i.startsWith("PAGE_TYPE_") &&
@@ -34,6 +51,23 @@ function Page(props) {
         }
       </div>);
   }
+
+  return (
+    <div className="page">
+      {el}
+      {
+        props.onEdit ?
+        <div className="page__edit">
+          <IconButton size="small" onClick={() => props.onDelete(props.idx)}>
+            <Delete fontSize="small" />
+          </IconButton><br />
+          <IconButton size="small" onClick={() => props.onEdit(props.idx)}>
+            <Edit fontSize="small" />
+          </IconButton>
+        </div> : ""
+      }
+    </div>
+  );
 }
 
 export default Page;

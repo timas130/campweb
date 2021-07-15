@@ -10,6 +10,7 @@ const SmallAvatar = withStyles((theme) => ({
     width: 22,
     height: 22,
     border: `2px solid ${theme.palette.background.paper}`,
+    borderRadius: window.localStorage.getItem("badgeRadius") || "4px"
   },
 }))(Avatar);
 

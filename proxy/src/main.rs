@@ -3,7 +3,7 @@ use std::{env, io::{Read, Write}, net::TcpStream, str::FromStr, sync::Arc, threa
 use byteorder::{BigEndian, ReadBytesExt, WriteBytesExt};
 use rustls::{ClientSession, ServerCertVerified};
 use webpki::DNSNameRef;
-use tiny_http::{Header, Method, Response, Server, StatusCode};
+use tiny_http::{Header, Response, Server};
 
 pub const IP: &str = "46.254.16.245";
 pub const CERT_ADDR: &str = "46.254.16.245:4027";
@@ -107,7 +107,7 @@ fn main() {
             resp.add_header(Header::from_str("Access-Control-Allow-Origin: *").unwrap());
             resp
         });
-        if let Err(_) = result {
+        if result.is_err() {
             println!("[srv] type=disconnected incorrectly");
         }
         

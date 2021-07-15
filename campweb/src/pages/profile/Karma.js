@@ -1,7 +1,7 @@
 import { useContext, useState } from "react";
 import { useHistory, useParams } from "react-router";
 import { ApiContext } from "../../api/ApiContext";
-import { useLoggedIn, useScrollToTop } from "../../App";
+import { useLoggedIn } from "../../App";
 import { CircularProgress, Container, List, ListItem, ListItemAvatar, ListItemText, Avatar, ListItemSecondaryAction } from "@material-ui/core";
 import RAccountsKarmaInFandomsGetAll, { count as karmaCount } from "../../api/requests/accounts/RAccountsKarmaInFandomsGetAll";
 import InView from "react-intersection-observer";
@@ -17,7 +17,6 @@ function ProfileKarma(props) {
   const [karmaEnd, setKarmaEnd] = useState(false);
 
   useLoggedIn(history, apiClient);
-  useScrollToTop();
 
   async function loadMoreKarma() {
     const resp = JSON.parse((await apiClient.makeRequest(

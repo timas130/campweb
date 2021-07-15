@@ -7,7 +7,7 @@ import InView from "react-intersection-observer";
 import { Alert, AlertTitle } from "@material-ui/lab";
 import RPostFeedGetAllSubscribe from "../api/requests/post/RPostFeedGetAllSubscribe";
 import { useHistory } from "react-router";
-import {useLoggedIn, useScrollToTop} from "../App";
+import {useLoggedIn} from "../App";
 import { version } from "../../package.json";
 
 async function loadMorePosts(apiClient, posts, setPosts, loading, setLoading, tab) {
@@ -44,7 +44,6 @@ function Feed(props) {
   const history = useHistory()
 
   useLoggedIn(history, apiClient);
-  useScrollToTop();
   useEffect(() => {
     if (posts.length === 0)
       loadMorePosts(apiClient, posts, setPosts, loading, setLoading, tab);
