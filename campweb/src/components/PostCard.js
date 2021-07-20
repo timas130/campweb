@@ -5,7 +5,7 @@ import moment from "moment";
 import "moment/locale/ru";
 import { useContext, useState } from "react";
 import "./PostCard.css";
-import { ArrowDownward, ArrowUpward, Comment } from "@material-ui/icons";
+import {ArrowDownward, ArrowUpward, Comment, Edit} from "@material-ui/icons";
 import { theme } from "../App";
 import { ApiContext } from "../api/ApiContext";
 import RPublicationsKarmaAdd from "../api/requests/post/RPublicationsKarmaAdd";
@@ -89,27 +89,39 @@ function PostCard(props) {
           {expanded ? "Свернуть" : `Раскрыть (${pages.length})`}
         </Button>}
 
+        {
+          props.draft ?
+          <Button
+            size="small" style={{marginLeft: "auto"}}
+            onClick={() => history.push("/drafts/" + props.post.id)}
+          >
+            <Edit fontSize="small" style={{marginRight: 5}} />
+            Изменить
+          </Button> :
+          <Button
+            size="small" style={{marginLeft: "auto"}}
+            onClick={() => history.push("/post/" + props.post.id)}
+          >
+            <Comment fontSize="small" style={{marginRight: 5}} />
+            {props.post.subUnitsCount}
+          </Button>
+        }
         {/* Karma */}
-        <Button
-          size="small" style={{marginLeft: "auto"}}
-          onClick={() => history.push("/post/" + props.post.id)}
-        >
-          <Comment fontSize="small" style={{marginRight: 5}} />
-          {props.post.subUnitsCount}
-        </Button>
-        <IconButton
-          size="small" onClick={() => addKarma(false)}
-          disabled={!! (myPost || props.post.myKarma || voted)}
-        >
-          <ArrowDownward htmlColor={props.post.myKarma < 0 ? theme.palette.success.main : null } />
-        </IconButton>
-        <Karma amount={props.post.karmaCount + voted} />
-        <IconButton
-          size="small" onClick={() => addKarma(true)}
-          disabled={!! (myPost || props.post.myKarma || voted)}
-        >
-          <ArrowUpward htmlColor={props.post.myKarma > 0 ? theme.palette.success.main : null } />
-        </IconButton>
+        {!props.draft && <>
+          <IconButton
+            size="small" onClick={() => addKarma(false)}
+            disabled={!! (myPost || props.post.myKarma || voted)}
+          >
+            <ArrowDownward htmlColor={props.post.myKarma < 0 ? theme.palette.success.main : null } />
+          </IconButton>
+          <Karma amount={props.post.karmaCount + voted} />
+          <IconButton
+            size="small" onClick={() => addKarma(true)}
+            disabled={!! (myPost || props.post.myKarma || voted)}
+          >
+            <ArrowUpward htmlColor={props.post.myKarma > 0 ? theme.palette.success.main : null } />
+          </IconButton>
+        </>}
       </CardActions>
     </Card>
   </div>);

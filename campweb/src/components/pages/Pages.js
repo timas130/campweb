@@ -14,6 +14,7 @@ function spoilersNest(pages, start, len) {
       spoilerContent[0].J_PAGE_TYPE = API["PAGE_TYPE_SPOILER"];
       result.push(spoilerContent[0]);
       i += spoilerContent[1] + 1;
+      len += spoilerContent[1];
     } else {
       result.push(pages[i]);
       i++;

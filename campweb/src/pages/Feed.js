@@ -6,8 +6,6 @@ import RPostFeedGetAll from "../api/requests/post/RPostFeedGetAll";
 import InView from "react-intersection-observer";
 import { Alert, AlertTitle } from "@material-ui/lab";
 import RPostFeedGetAllSubscribe from "../api/requests/post/RPostFeedGetAllSubscribe";
-import { useHistory } from "react-router";
-import {useLoggedIn} from "../App";
 import { version } from "../../package.json";
 
 async function loadMorePosts(apiClient, posts, setPosts, loading, setLoading, tab) {
@@ -41,9 +39,7 @@ async function loadMorePosts(apiClient, posts, setPosts, loading, setLoading, ta
 function Feed(props) {
   const apiClient = useContext(ApiContext);
   const { posts, setPosts, loading, setLoading, tab, setTab } = props;
-  const history = useHistory()
 
-  useLoggedIn(history, apiClient);
   useEffect(() => {
     if (posts.length === 0)
       loadMorePosts(apiClient, posts, setPosts, loading, setLoading, tab);

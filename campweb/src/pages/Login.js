@@ -1,7 +1,7 @@
 import { Container, TextField, ButtonGroup, Button, Link, Backdrop, CircularProgress } from "@material-ui/core";
 import { Alert, AlertTitle } from "@material-ui/lab";
 import { useContext, useEffect, useState } from "react";
-import { useHistory } from "react-router";
+import {useHistory, useLocation} from "react-router";
 import { ApiContext } from "../api/ApiContext";
 import API from "../api/api.json";
 import RAccountsLogin from "../api/requests/accounts/RAccountsLogin";
@@ -15,6 +15,8 @@ function Login() {
   const [error, setError] = useState(null);
   const history = useHistory();
   const apiClient = useContext(ApiContext);
+  const location = useLocation();
+  const { next } = location.state || {next: {pathname: "/feed"}};
 
   const onLogin = async () => {
     setLoading(true);
@@ -27,8 +29,7 @@ function Login() {
         throw new Error("Server didn't send access token!");
       setLoading(false);
 
-      const next = new URLSearchParams(history.location.search).get("next");
-      history.replace(next || "/feed");
+      history.push(next);
     } catch (e) {
       setError(e);
       console.error("error", e);

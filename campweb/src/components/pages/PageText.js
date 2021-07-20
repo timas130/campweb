@@ -288,7 +288,7 @@ export function PageTextCreate(props) {
           <FormatAlignRight fontSize="small" />
         </IconButton>
 
-        <IconButton size="small" style={{marginLeft: "auto"}}
+        <IconButton size="small"
                     color="primary" onClick={() => onClose(page)}
                     disabled={! page["J_TEXT"]}>
           <Done fontSize="small" />

@@ -17,7 +17,7 @@ import {
 import { ExpandLess, ExpandMore } from "@material-ui/icons";
 import { TabContext, TabPanel } from "@material-ui/lab";
 import React, { useContext, useEffect, useState } from "react";
-import {useHistory, useParams} from "react-router";
+import {useParams} from "react-router";
 import { ApiContext } from "../../api/ApiContext";
 import {
   achievementPacks,
@@ -26,7 +26,7 @@ import {
   achievements as achievementsList, karmaAchievements
 } from "../../api/consts/Achievements";
 import RAchievementsInfo from "../../api/requests/achievements/RAchievementsInfo";
-import {theme, useLoggedIn} from "../../App";
+import {theme} from "../../App";
 import levels, {levelTranslateNames} from "../../api/consts/Levels";
 import CampfireImage from "../../components/CampfireImage";
 import RAchievementsPack from "../../api/requests/achievements/RAchievementsPack";
@@ -47,9 +47,6 @@ function Achievements(props) {
   const [expanded, setExpanded] = useState({});
   const [achievementsProgress, setAchievementsProgress] = useState({});
   const { accountId } = useParams();
-  const history = useHistory();
-
-  useLoggedIn(history, apiClient);
 
   useEffect(() => {
     async function loadAchievements() {

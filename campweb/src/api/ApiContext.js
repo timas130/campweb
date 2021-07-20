@@ -7,7 +7,7 @@ const apiVersion = "1.251";
 const projectKey = API["PROJECT_KEY_CAMPFIRE"];
 export const protoadmins = [1];
 
-const proxyAddr =
+export const proxyAddr =
   process.env.NODE_ENV === "production" ?
   "https://campweb-proxy.herokuapp.com/" :
   "http://192.168.1.104:8080/";
@@ -40,22 +40,17 @@ export class ApiClient {
   makeRequest(req) {
     // prepare
     req["J_REQUEST_DATE"] = new Date().getTime() * 1000000;
-    if (this.loginToken && !req["__media__"]) req["J_API_LOGIN_TOKEN"] = this.loginToken;
+    if (req["J_REQUEST_NAME"] === "RAccountsLogin" && this.loginToken)
+      req["J_API_LOGIN_TOKEN"] = this.loginToken;
     if (this.accessToken && !req["__media__"]) req["J_API_ACCESS_TOKEN"] = this.accessToken;
     req["J_API_REFRESH_TOKEN"] = "";
     req["requestApiVersion"] = req["__media__"] ? "1" : apiVersion;
     req["requestProjectKey"] = projectKey;
 
     // send
-    return new Promise((resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
       const xhr = new XMLHttpRequest();
       xhr.open("POST", proxyAddr, true);
-      let payload;
-      if (req["__media__"]) {
-        payload = "__proxy__(media):" + JSON.stringify(req);
-      } else {
-        payload = JSON.stringify(req);
-      }
       if (req["__type__"] === "binary") {
         xhr.responseType = "blob";
       }
@@ -77,6 +72,7 @@ export class ApiClient {
         }
         if (data["__proxy_error__"]) {
           reject("Proxy error: " + data["__proxy_error__"]);
+          this.onError && this.onError("Proxy error: " + data["__proxy_error__"]);
           return;
         }
         if (data["J_API_ACCESS_TOKEN"]) {
@@ -93,15 +89,29 @@ export class ApiClient {
           reject("Server responded with an error: " + (data["J_RESPONSE"].code || "[unknown]"));
           if (data["J_RESPONSE"].code === "CODE_UNAUTHORIZED") {
             this.onUnauthorized && this.onUnauthorized();
+          } else {
+            this.onError && this.onError("Server responded with an error: " + (data["J_RESPONSE"].code || "[unknown]"));
           }
         }
       };
       xhr.onerror = (ev) => {
         reject("Request error");
+        this.onError && this.onError("Unknown request error");
       };
 
+      let reqClone = Object.assign({}, req);
+      reqClone["__media__"] = undefined;
+      reqClone["__type__"] = undefined;
+      reqClone["__data__"] = undefined;
+
+      const jsonPayload = JSON.stringify(reqClone);
       console.log(`[${req["J_REQUEST_NAME"]}] sending token_present=${!!this.accessToken}`);
-      xhr.send(payload);
+      xhr.send(new Blob([
+        new TextEncoder().encode(jsonPayload).length.toString() + ":", // json length
+        req["__media__"] ? "__proxy__(media):" : "", // media prefix
+        jsonPayload,
+        ...req["__data__"]
+      ]));
     });
   }
 }

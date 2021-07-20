@@ -53,7 +53,7 @@ function Page(props) {
   }
 
   return (
-    <div className="page">
+    <div className={"page " + (props.onEdit ? "page_editable" : "")}>
       {el}
       {
         props.onEdit ?

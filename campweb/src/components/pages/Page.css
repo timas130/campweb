@@ -2,6 +2,9 @@
   margin: 8px 0;
   position: relative;
 }
+.page_editable {
+  min-height: 56px;
+}
 .page__edit {
   position: absolute;
   right: 4px; top: 4px;

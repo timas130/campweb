@@ -1,4 +1,4 @@
-import { useHistory, useParams } from "react-router";
+import { useParams } from "react-router";
 import { CircularProgress, Container } from "@material-ui/core";
 import { useContext, useEffect, useState } from "react";
 import PostCard from "../components/PostCard";
@@ -6,16 +6,13 @@ import { ApiContext } from "../api/ApiContext";
 import RPostGet from "../api/requests/post/RPostGet";
 import Comments from "../components/Comments";
 import Tags from "../components/Tags";
-import {useLoggedIn} from "../App";
 
 function Post(props) {
   const { postId } = useParams();
   const [post, setPost] = useState(null);
   const [tags, setTags] = useState(null);
   const apiClient = useContext(ApiContext);
-  const history = useHistory();
 
-  useLoggedIn(history, apiClient);
   useEffect(() => {
     async function loadPost() {
       const response = await apiClient.makeRequest(

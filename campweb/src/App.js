@@ -4,7 +4,7 @@ import {Router, Switch, Route, useHistory, Redirect} from "react-router-dom";
 import Login from "./pages/Login";
 import { ApiClient, ApiContext } from './api/ApiContext';
 import Feed from './pages/Feed';
-import { useEffect, useState } from 'react';
+import {useContext, useState} from 'react';
 import { Alert } from '@material-ui/lab';
 import Post from "./pages/Post";
 import AppToolbar from './components/AppToolbar';
@@ -15,6 +15,7 @@ import Create from "./pages/Create";
 import Settings from "./pages/Settings";
 import {createBrowserHistory} from "history";
 import {wrapHistory} from "oaf-react-router";
+import Drafts from "./pages/Drafts";
 
 export const theme = createMuiTheme({
   palette: {
@@ -57,24 +58,24 @@ function HideOnScroll(props) {
   );
 }
 
-export const useLoggedIn = (history, apiClient) => {
-  useEffect(() => {
-    if (! apiClient.loginInfo) {
-      const params = new URLSearchParams();
-      params.append("next", history.location.pathname);
-      history.push({
-        pathname: "/login",
-        search: params.toString()
-      });
-    }
-  });
-};
-
 const browserHistory = createBrowserHistory();
 wrapHistory(browserHistory, {
   disableAutoScrollRestoration: false,
   restorePageStateOnPop: true
 });
+
+function PrivateRoute(props) {
+  const apiClient = useContext(ApiContext);
+  const {children, ...rest} = props;
+  return <Route
+    {...rest}
+    render={
+      ({ location }) =>
+        apiClient.loginInfo ?
+        children :
+        <Redirect to={{pathname: "/login", state: {next: location}}} />
+    } />;
+}
 
 function App() {
   const history = useHistory();
@@ -84,6 +85,7 @@ function App() {
     history.push("/login");
   };
   client.onError = (e) => {
+    console.log("request error:", e);
     setError(e);
   };
   const closeSnackbar = (ev, reason) => {
@@ -112,23 +114,25 @@ function App() {
           >
             <CssBaseline />
             <Switch>
-              <Route path="/" exact><Redirect to="/login" /></Route>
+              <Route path="/" exact><Redirect to="/feed" /></Route>
               <Route path="/login"><Login /></Route>
-              <Route path="/settings"><Settings /></Route>
-              <Route path="/feed">
+              <PrivateRoute path="/settings"><Settings /></PrivateRoute>
+              <PrivateRoute path="/feed">
                 <Feed
                   posts={posts} setPosts={setPosts}
                   loading={loading} setLoading={setLoading}
                   tab={tab} setTab={setTab}
                 />
-              </Route>
+              </PrivateRoute>
 
-              <Route path="/post/:postId"><Post /></Route>
-              <Route path="/drafts/:draftId"><Create /></Route>
+              <PrivateRoute path="/post/:postId"><Post /></PrivateRoute>
 
-              <Route path="/account/:accountId" exact><Profile /></Route>
-              <Route path="/account/:accountId/karma" exact><ProfileKarma /></Route>
-              <Route path="/account/:accountId/achievements" exact><Achievements /></Route>
+              <PrivateRoute path="/drafts/" exact><Drafts /></PrivateRoute>
+              <PrivateRoute path="/drafts/:draftId"><Create /></PrivateRoute>
+
+              <PrivateRoute path="/account/:accountId" exact><Profile /></PrivateRoute>
+              <PrivateRoute path="/account/:accountId/karma" exact><ProfileKarma /></PrivateRoute>
+              <PrivateRoute path="/account/:accountId/achievements" exact><Achievements /></PrivateRoute>
             </Switch>
           </Box>
           <Snackbar open={!!error} autoHideDuration={5000} onClose={closeSnackbar}>

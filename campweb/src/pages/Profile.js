@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from "react";
 import { useHistory, useParams } from "react-router";
 import { ApiContext } from "../api/ApiContext";
-import { theme, useLoggedIn } from "../App";
+import { theme } from "../App";
 import { CircularProgress, Collapse, Container, withStyles } from "@material-ui/core";
 import RAccountsGet from "../api/requests/accounts/RAccountsGet";
 import RAccountsGetProfile from "../api/requests/accounts/RAccountsGetProfile";
@@ -76,8 +76,6 @@ function Profile() {
     setPubs([...pubs, ...resp]);
     if (resp.length < req.count) setPubsEnd(true);
   }
-
-  useLoggedIn(history, apiClient);
 
   return (
     <Container maxWidth="sm">

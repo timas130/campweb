@@ -36,7 +36,8 @@ export function PageVideoCreate(props) {
   const [page, setPage] = useState({
     ...props.page,
     J_PAGE_TYPE: API["PAGE_TYPE_VIDEO"],
-    videoId: props.page.videoId || ""
+    videoId: props.page.videoId || "",
+    J_H: 0, J_W: 0, imageId: 0
   });
   const fullScreen = useMediaQuery(theme.breakpoints.down("xs"));
 
@@ -52,7 +53,7 @@ export function PageVideoCreate(props) {
         />
       </DialogContent>
       <DialogActions>
-        <IconButton size="small" style={{marginLeft: "auto"}}
+        <IconButton size="small"
                     color="primary" onClick={() => onClose(page)}
                     disabled={! page.videoId}>
           <Done fontSize="small" />

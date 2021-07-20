@@ -51,13 +51,12 @@ export function PageSpoilerCreate(props) {
           style={{marginBottom: 16}}
         />
         <TextField
-          label="Название"
-          fullWidth value={page.name}
+          label="Название" fullWidth value={page.name}
           onChange={ev => setPage({...page, name: ev.target.value})}
         />
       </DialogContent>
       <DialogActions>
-        <IconButton size="small" style={{marginLeft: "auto"}}
+        <IconButton size="small"
                     color="primary" onClick={() => onClose(page)}
                     disabled={
                       page.count === "" ||
