@@ -10,29 +10,39 @@ import {
   ListItemIcon,
   ListItemText
 } from "@material-ui/core";
-import {Add, Code, Done, FormatQuote, Image, TextFormat, Videocam} from "@material-ui/icons";
+import {Add, Code, Done, FormatQuote, Image, Link, TextFormat, Videocam} from "@material-ui/icons";
 import {useContext, useEffect, useState} from "react";
-import {PageTextCreate} from "../components/pages/PageText";
-import Pages from "../components/pages/Pages";
-import {theme} from "../App";
-import {PageVideoCreate} from "../components/pages/PageVideo";
-import API from "../api/api.json";
-import {ApiContext, proxyAddr} from "../api/ApiContext";
-import {PageSpoilerCreate} from "../components/pages/PageSpoiler";
+import {PageTextCreate} from "../../components/pages/PageText";
+import Pages from "../../components/pages/Pages";
+import {theme} from "../../App";
+import {PageVideoCreate} from "../../components/pages/PageVideo";
+import API from "../../api/api.json";
+import {ApiContext, proxyAddr} from "../../api/ApiContext";
+import {PageSpoilerCreate} from "../../components/pages/PageSpoiler";
 import {useParams} from "react-router";
-import RPostGetDraft from "../api/requests/post/RPostGetDraft";
-import RPostPutPage from "../api/requests/post/RPostPutPage";
-import RPostChangePage from "../api/requests/post/RPostChangePage";
-import RPostRemovePage from "../api/requests/post/RPostRemovePage";
-import {PageQuoteCreate} from "../components/pages/PageQuote";
-import {PageImageCreate} from "../components/pages/PageImage";
+import RPostGetDraft from "../../api/requests/post/RPostGetDraft";
+import RPostPutPage from "../../api/requests/post/RPostPutPage";
+import RPostChangePage from "../../api/requests/post/RPostChangePage";
+import RPostRemovePage from "../../api/requests/post/RPostRemovePage";
+import {PageQuoteCreate} from "../../components/pages/PageQuote";
+import {PageImageCreate} from "../../components/pages/PageImage";
+import {useHistory, useLocation} from "react-router-dom";
+import {PageLinkCreate} from "../../components/pages/PageLink";
 
 function Create() {
   const apiClient = useContext(ApiContext);
-
+  const history = useHistory();
+  const location = useLocation();
   const params = useParams();
+
+  useEffect(() => {
+    if (! (location.state || {}).fandom && ! params.draftId) {
+      history.push("/drafts");
+    }
+  // eslint-disable-next-line
+  }, []);
   const [draftId, setDraftId] = useState(parseInt(params.draftId) || 0);
-  const [fandomId, setFandomId] = useState(params.fandom || 2597);
+  const [fandomId, setFandomId] = useState((location.state || {}).fandom);
   const [loading, setLoading] = useState(false);
   const [pages, setPages] = useState([]);
   const [page, setPage] = useState({});
@@ -45,20 +55,49 @@ function Create() {
   async function syncPageWithServer(page, editing) {
     setLoading(true);
     try {
-      if (editing === -1) { // put page
-        const req = new RPostPutPage(
+      let req;
+      if (editing === -1) {
+        req = new RPostPutPage(
           draftId, fandomId, [page]
         );
-        if (page["J_PAGE_TYPE"] === API["PAGE_TYPE_VIDEO"]) {
-          req.addDataOutput(await (await fetch(proxyAddr + "yt/" + page.videoId)).blob());
+      } else {
+        req = new RPostChangePage(
+          draftId, page, editing
+        );
+      }
+      if (page["J_PAGE_TYPE"] === API["PAGE_TYPE_VIDEO"]) {
+        req.addDataOutput(await (await fetch(proxyAddr + "yt/" + page.videoId)).blob());
+      } else if (page["J_PAGE_TYPE"] === API["PAGE_TYPE_IMAGE"]) {
+        console.log(page.imageBlob);
+        req.addDataOutput(page.imageBlob);
+        req.dataOutput = [...JSON.parse(req.dataOutput), -1];
+      } else if (page["J_PAGE_TYPE"] === API["PAGE_TYPE_IMAGES"]) {
+        apiClient.onError(
+          "Из-за того, что изображения должны сжиматься " +
+          "и уменьшаться на клиенте, эта функция пока не работает."
+        );
+        setLoading(false);
+        return;
+        // for (const blob of page.imageBlobs) {
+        //   req.addDataOutput(blob);
+        // }
+        // req.dataOutput = [...JSON.parse(req.dataOutput), -1];
+      }
+      let resp;
+      try {
+        resp = await apiClient.makeRequest(req);
+      } catch (e) {
+        if (e.includes("E_BAD_PAGE") && page["J_PAGE_TYPE"] === API["PAGE_TYPE_IMAGE"]) {
+          apiClient.onError(
+            "Скорее всего ошибка в том, что изображение " +
+            "слишком большое, а сжимать их на клиенте я пока не смог."
+          );
         }
-        const resp = await apiClient.makeRequest(req);
+      }
+      if (editing === -1) {
         setDraftId(resp.unitId);
         setPages([...pages, ...JSON.parse(resp.pages)]);
       } else {
-        const resp = await apiClient.makeRequest(new RPostChangePage(
-          draftId, page, editing
-        ));
         const newPages = [...pages];
         newPages[editing] = resp.page;
         setPages(newPages);
@@ -106,7 +145,6 @@ function Create() {
       const resp = await apiClient.makeRequest(
         new RPostGetDraft(draftId)
       );
-      console.log(resp.unit);
       setPages(JSON.parse(JSON.parse(resp.unit.jsonDB)["J_PAGES"]));
       setFandomId(resp.unit.fandom.id);
     }
@@ -126,6 +164,8 @@ function Create() {
         diagType === API["PAGE_TYPE_SPOILER"] ? <PageSpoilerCreate {...createElProps} /> :
         diagType === API["PAGE_TYPE_QUOTE"] ? <PageQuoteCreate {...createElProps} /> :
         diagType === API["PAGE_TYPE_IMAGE"] ? <PageImageCreate {...createElProps} /> :
+        diagType === API["PAGE_TYPE_IMAGES"] ? <PageImageCreate {...createElProps} /> :
+        diagType === API["PAGE_TYPE_LINK"] ? <PageLinkCreate {...createElProps} /> :
         null
       }
       <Backdrop style={{zIndex: 99999}} open={loading}><CircularProgress /></Backdrop>
@@ -159,6 +199,10 @@ function Create() {
             <ListItemIcon><Image /></ListItemIcon>
             <ListItemText>Картинка</ListItemText>
           </ListItem>
+          <ListItem button onClick={() => createPage(API["PAGE_TYPE_LINK"])}>
+            <ListItemIcon><Link /></ListItemIcon>
+            <ListItemText>Ссылка</ListItemText>
+          </ListItem>
         </List>
         <DialogActions>
           <Button onClick={() => setTypeDiagOpen(false)}>Закрыть</Button>
@@ -169,11 +213,14 @@ function Create() {
         position: "fixed",
         bottom: 16, right: 80
       }} onClick={() => setTypeDiagOpen(true)}><Add /></Fab>
-      <Fab style={{
-        position: "fixed",
-        bottom: 16, right: 16,
-        background: theme.palette.success.main
-      }}><Done /></Fab>
+      <Fab
+        style={{
+          position: "fixed",
+          bottom: 16, right: 16,
+          background: theme.palette.success.main
+        }}
+        onClick={() => history.push(`/drafts/${draftId}/publish`)}
+      ><Done /></Fab>
     </Container>
   );
 }

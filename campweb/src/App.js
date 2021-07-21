@@ -11,11 +11,12 @@ import AppToolbar from './components/AppToolbar';
 import Profile from './pages/Profile';
 import ProfileKarma from './pages/profile/Karma';
 import Achievements from './pages/profile/Achievements';
-import Create from "./pages/Create";
+import Create from "./pages/drafts/Create";
 import Settings from "./pages/Settings";
 import {createBrowserHistory} from "history";
 import {wrapHistory} from "oaf-react-router";
-import Drafts from "./pages/Drafts";
+import Drafts from "./pages/drafts/Drafts";
+import Publish from "./pages/drafts/Publish";
 
 export const theme = createMuiTheme({
   palette: {
@@ -128,7 +129,8 @@ function App() {
               <PrivateRoute path="/post/:postId"><Post /></PrivateRoute>
 
               <PrivateRoute path="/drafts/" exact><Drafts /></PrivateRoute>
-              <PrivateRoute path="/drafts/:draftId"><Create /></PrivateRoute>
+              <PrivateRoute path="/drafts/:draftId" exact><Create /></PrivateRoute>
+              <PrivateRoute path="/drafts/:draftId/publish" exact><Publish /></PrivateRoute>
 
               <PrivateRoute path="/account/:accountId" exact><Profile /></PrivateRoute>
               <PrivateRoute path="/account/:accountId/karma" exact><ProfileKarma /></PrivateRoute>

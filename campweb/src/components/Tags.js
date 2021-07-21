@@ -1,20 +1,22 @@
 import { Chip, Avatar } from "@material-ui/core";
 import CampfireImage from "./CampfireImage";
 
-function Tag(props) {
+export function Tag(props) {
+  const { main, jsonDB, index, style, ...rest } = props;
   return (
     <Chip
       style={{
-        margin: props.main ?
-          (props.index === 0 ? "2px 0 2px 0" : "2px 0 2px 10px") :
-          "2px 0 2px 2px"
+        margin: main ?
+          (index === 0 ? "2px 0 2px 0" : "2px 0 2px 10px") :
+          "2px 0 2px 2px",
+        ...style
       }}
-      variant={props.main ? "default" : "outlined"}
-
-      label={props.jsonDB["J_NAME"]}
-      avatar={props.jsonDB["J_IMAGE_ID"] ? <Avatar>
-        <CampfireImage id={props.jsonDB["J_IMAGE_ID"]} style={{maxWidth: "100%"}} />
+      color={main ? "primary" : "default"}
+      label={jsonDB["J_NAME"]}
+      avatar={jsonDB["J_IMAGE_ID"] ? <Avatar>
+        <CampfireImage id={jsonDB["J_IMAGE_ID"]} style={{maxWidth: "100%"}} />
       </Avatar> : null}
+      {...rest}
     />
   );
 }
