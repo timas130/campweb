@@ -10,6 +10,7 @@ import {theme} from "../../App";
 import {Done} from "@material-ui/icons";
 import RPostPublication from "../../api/requests/post/RPostPublication";
 import {useHistory} from "react-router-dom";
+import API from "../../api/api.json";
 
 export default function Publish() {
   const apiClient = useContext(ApiContext);
@@ -30,11 +31,9 @@ export default function Publish() {
       const draftLoaded = (await apiClient.makeRequest(
         new RPostGetDraft(draftId)
       )).unit;
-      // setDraft(draftLoaded);
       const tagsLoaded = JSON.parse((await apiClient.makeRequest(
-        new RTagsGetAll(draftLoaded.fandom.id, draftLoaded.languageId)
+        new RTagsGetAll(draftLoaded.fandom.id, API["LANGUAGE_RU"])
       )).tags);
-      console.log(tagsLoaded);
       setTags(tagsLoaded);
       setTagsLoading(false);
     }
