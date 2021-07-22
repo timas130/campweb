@@ -10,7 +10,6 @@ import {theme} from "../../App";
 import {Done} from "@material-ui/icons";
 import RPostPublication from "../../api/requests/post/RPostPublication";
 import {useHistory} from "react-router-dom";
-import API from "../../api/api.json";
 
 export default function Publish() {
   const apiClient = useContext(ApiContext);
@@ -32,7 +31,7 @@ export default function Publish() {
         new RPostGetDraft(draftId)
       )).unit;
       const tagsLoaded = JSON.parse((await apiClient.makeRequest(
-        new RTagsGetAll(draftLoaded.fandom.id, API["LANGUAGE_RU"])
+        new RTagsGetAll(draftLoaded.fandom.id, draftLoaded.languageId)
       )).tags);
       setTags(tagsLoaded);
       setTagsLoading(false);
@@ -43,7 +42,7 @@ export default function Publish() {
 
   const onPublish = async () => {
     const req = new RPostPublication(
-      draftId, tags, "", notifyFollowers, 0,
+      draftId, activeTags, "", notifyFollowers, 0,
       closedPost, multilingual, 0, 0, 0
     );
     await apiClient.makeRequest(req);
@@ -67,16 +66,15 @@ export default function Publish() {
               .map(childTag => (
                 <Tag
                   key={childTag.id}
-                  main={activeTags[childTag.id]}
+                  main={activeTags.includes(childTag.id)}
                   style={{margin: "2px 0 2px 2px"}}
                   jsonDB={JSON.parse(childTag.jsonDB)}
                   onClick={() => {
-                    const newTags = [...activeTags];
-                    if (newTags[childTag.id]) {
-                      delete newTags[childTag.id];
-                    } else {
-                      newTags[childTag.id] = true;
-                    }
+                    let newTags = [...activeTags];
+                    if (newTags.includes(childTag.id))
+                      delete newTags[newTags.indexOf(childTag.id)];
+                    else
+                      newTags.push(childTag.id);
                     setActiveTags(newTags);
                   }}
                 />
@@ -85,6 +83,7 @@ export default function Publish() {
       }
       {!tagsLoading && tags.length === 0 && "Тегов в этом фэндоме пока нет"}
 
+      <br />
       <FormControlLabel
         control={<Checkbox
           checked={notifyFollowers} color="primary"

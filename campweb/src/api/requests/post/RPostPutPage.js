@@ -1,4 +1,5 @@
 import Request from "../Request";
+import API from "../../api.json";
 
 export default class RPostPutPage extends Request {
   constructor(id, fandomId, pages) {
@@ -8,5 +9,6 @@ export default class RPostPutPage extends Request {
     this.appKey = "";
     this.appSubKey = "";
     this.pages = JSON.stringify(pages);
+    this.languageId = API["LANGUAGE_RU"];
   }
 }

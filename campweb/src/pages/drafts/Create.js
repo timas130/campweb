@@ -220,6 +220,7 @@ function Create() {
           background: theme.palette.success.main
         }}
         onClick={() => history.push(`/drafts/${draftId}/publish`)}
+        disabled={!draftId}
       ><Done /></Fab>
     </Container>
   );
