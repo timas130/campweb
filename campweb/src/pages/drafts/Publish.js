@@ -1,35 +1,82 @@
 import {useContext, useEffect, useState} from "react";
 import {ApiContext} from "../../api/ApiContext";
 import {useParams} from "react-router";
-import {Checkbox, CircularProgress, Container, Fab, FormControlLabel} from "@material-ui/core";
+import {Checkbox, CircularProgress, Container, Fab, FormControlLabel, List, ListItem, ListItemText, Dialog, Toolbar, Typography, IconButton, ListItemSecondaryAction} from "@material-ui/core";
 import RTagsGetAll from "../../api/requests/tags/RTagsGetAll";
 import RPostGetDraft from "../../api/requests/post/RPostGetDraft";
 import {Tag} from "../../components/Tags";
 import React from "react";
 import {theme} from "../../App";
-import {Done} from "@material-ui/icons";
+import {Done, Close, Delete} from "@material-ui/icons";
 import RPostPublication from "../../api/requests/post/RPostPublication";
 import {useHistory} from "react-router-dom";
+import RActivitiesGetAllForAccount from "../../api/requests/activities/RActivitiesGetAllForAccount";
+import InView from "react-intersection-observer";
+
+function SelectActivityDialog(props) {
+  const apiClient = useContext(ApiContext);
+  const [activities, setActivities] = useState([]);
+  const [canLoadMore, setCanLoadMore] = useState(true);
+
+  async function loadActivities() {
+    const resp = JSON.parse((await apiClient.makeRequest(
+      new RActivitiesGetAllForAccount(
+        apiClient.loginInfo.account["J_ID"],
+        props.draft.fandom.id, props.draft.languageId,
+        activities.length
+      )
+    )).userActivities);
+    setActivities([...activities, ...resp]);
+    if (resp.length === 0) setCanLoadMore(false);
+  }
+
+  return (
+    <Dialog fullScreen open={props.open}>
+      <Toolbar>
+        <Typography variant="h6">Выберите фэндом</Typography>
+        <IconButton onClick={() => props.onSelect(null)} style={{marginLeft: "auto"}}>
+          <Close />
+        </IconButton>
+      </Toolbar>
+      <Container maxWidth="sm">
+        <List>
+          {activities.map(activity => (
+            <ListItem button key={activity.id} onClick={() => props.onSelect(activity)}>
+              <ListItemText primary={activity.name} secondary={activity.description} />
+            </ListItem>
+          ))}
+        </List>
+        {canLoadMore && <InView as="div" onChange={inView => inView && loadActivities()}
+                style={{textAlign: "center", padding: 10}}>
+          <CircularProgress />
+        </InView>}
+      </Container>
+    </Dialog>
+  );
+}
 
 export default function Publish() {
   const apiClient = useContext(ApiContext);
   const history = useHistory();
   const draftId = parseInt(useParams().draftId);
 
-  // const [draft, setDraft] = useState(null);
+  const [draft, setDraft] = useState(null);
   const [tags, setTags] = useState([]);
   const [activeTags, setActiveTags] = useState([]);
   const [tagsLoading, setTagsLoading] = useState(true);
+  const [activitySelectorOpen, setActivitySelectorOpen] = useState(false);
 
   const [notifyFollowers, setNotifyFollowers] = useState(false);
   const [closedPost, setClosedPost] = useState(false);
   const [multilingual, setMultilingual] = useState(false);
+  const [activity, setActivity] = useState(null);
 
   useEffect(() => {
     async function load() {
       const draftLoaded = (await apiClient.makeRequest(
         new RPostGetDraft(draftId)
       )).unit;
+      setDraft(draftLoaded);
       const tagsLoaded = JSON.parse((await apiClient.makeRequest(
         new RTagsGetAll(draftLoaded.fandom.id, draftLoaded.languageId)
       )).tags);
@@ -43,7 +90,7 @@ export default function Publish() {
   const onPublish = async () => {
     const req = new RPostPublication(
       draftId, activeTags, "", notifyFollowers, 0,
-      closedPost, multilingual, 0, 0, 0
+      closedPost, multilingual, 0, activity ? activity.id : 0, 0
     );
     await apiClient.makeRequest(req);
 
@@ -51,7 +98,18 @@ export default function Publish() {
   };
 
   return (
-    <Container maxWidth="sm">
+    <Container maxWidth="sm" style={{paddingBottom: 80}}>
+      {
+        draft &&
+        <SelectActivityDialog
+          open={activitySelectorOpen} draft={draft}
+          onSelect={activity => {
+            if (activity) setActivity(activity);
+            setActivitySelectorOpen(false);
+          }}
+        />
+      }
+
       {
         tagsLoading ?
         <div style={{width: "100%", padding: 20, textAlign: "center"}}>
@@ -90,21 +148,35 @@ export default function Publish() {
           onChange={ev => setNotifyFollowers(ev.target.checked)}
         />}
         label="Уведомить своих подписчиков"
-      />
+      /><br />
       <FormControlLabel
         control={<Checkbox
           checked={closedPost} color="primary"
           onChange={ev => setClosedPost(ev.target.checked)}
         />}
         label="Закрытая публикация"
-      />
+      /><br />
       <FormControlLabel
         control={<Checkbox
           checked={multilingual} color="primary"
           onChange={ev => setMultilingual(ev.target.checked)}
         />}
         label="Мультиязычный"
-      />
+      /><br />
+
+      <List>
+        <ListItem button>
+          <ListItemText primary="Добавить рубрику" />
+        </ListItem>
+        <ListItem button onClick={() => setActivitySelectorOpen(true)}>
+          <ListItemText primary={
+            activity ? "Эстафета: " + activity.name : "Добавить эстафету"
+          } />
+          {activity && <ListItemSecondaryAction>
+            <IconButton onClick={() => setActivity(null)}><Delete /></IconButton>
+          </ListItemSecondaryAction>}
+        </ListItem>
+      </List>
 
       <Fab
         style={{

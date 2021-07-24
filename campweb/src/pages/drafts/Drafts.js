@@ -40,23 +40,25 @@ function FandomSelector(props) {
           <Close />
         </IconButton>
       </Toolbar>
-      <List>
-        {fandoms.map(fandom => (
-          <ListItem button onClick={() => onSelect(fandom.id)}>
-            <ListItemAvatar>
-              <Avatar><CampfireImage id={fandom.imageId} style={{width: "100%"}} /></Avatar>
-            </ListItemAvatar>
-            <ListItemText>{fandom.name}</ListItemText>
-          </ListItem>
-        ))}
-        {canLoadMore &&
-        <InView
-          as="div" style={{textAlign: "center", padding: 10}}
-          onChange={(inView) => inView && loadMoreFandoms()}
-        >
-          <CircularProgress />
-        </InView>}
-      </List>
+      <Container maxWidth="sm">
+        <List>
+          {fandoms.map(fandom => (
+            <ListItem button onClick={() => onSelect(fandom.id)} key={fandom.id}>
+              <ListItemAvatar>
+                <Avatar><CampfireImage id={fandom.imageId} style={{width: "100%"}} /></Avatar>
+              </ListItemAvatar>
+              <ListItemText>{fandom.name}</ListItemText>
+            </ListItem>
+          ))}
+          {canLoadMore &&
+          <InView
+            as="div" style={{textAlign: "center", padding: 10}}
+            onChange={(inView) => inView && loadMoreFandoms()}
+          >
+            <CircularProgress />
+          </InView>}
+        </List>
+      </Container>
     </Dialog>
   );
 }
@@ -95,7 +97,7 @@ export default function Drafts() {
               pathname: "/drafts/0",
               state: {fandom}
             });
-          }
+          } else setFandomSelOpen(false);
         }}
       />
       {drafts.map(draft => (

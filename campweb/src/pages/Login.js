@@ -29,7 +29,7 @@ function Login() {
         throw new Error("Server didn't send access token!");
       setLoading(false);
 
-      history.push(next);
+      history.replace(next);
     } catch (e) {
       setError(e);
       console.error("error", e);

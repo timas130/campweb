@@ -87,7 +87,7 @@ export class ApiClient {
           resolve(data["J_RESPONSE"] || {});
         } else {
           reject("Server responded with an error: " + (data["J_RESPONSE"].code || "[unknown]"));
-          if (data["J_RESPONSE"].code === "CODE_UNAUTHORIZED") {
+          if (data["J_RESPONSE"].code === "ERROR_UNAUTHORIZED") {
             this.onUnauthorized && this.onUnauthorized();
           } else {
             this.onError && this.onError("Server responded with an error: " + (data["J_RESPONSE"].code || "[unknown]"));
