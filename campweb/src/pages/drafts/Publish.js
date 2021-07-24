@@ -12,6 +12,8 @@ import RPostPublication from "../../api/requests/post/RPostPublication";
 import {useHistory} from "react-router-dom";
 import RActivitiesGetAllForAccount from "../../api/requests/activities/RActivitiesGetAllForAccount";
 import InView from "react-intersection-observer";
+import RRubricsGetAll, {count} from "../../api/requests/rubrics/RRubricsGetAll";
+import Karma from "../../components/Karma";
 
 function SelectActivityDialog(props) {
   const apiClient = useContext(ApiContext);
@@ -47,7 +49,52 @@ function SelectActivityDialog(props) {
           ))}
         </List>
         {canLoadMore && <InView as="div" onChange={inView => inView && loadActivities()}
-                style={{textAlign: "center", padding: 10}}>
+                                style={{textAlign: "center", padding: 10}}>
+          <CircularProgress />
+        </InView>}
+      </Container>
+    </Dialog>
+  );
+}
+
+function SelectRubricDialog(props) {
+  const apiClient = useContext(ApiContext);
+  const [rubrics, setRubrics] = useState([]);
+  const [canLoadMore, setCanLoadMore] = useState(true);
+
+  async function loadRubrics() {
+    const resp = JSON.parse((await apiClient.makeRequest(
+      new RRubricsGetAll(
+        props.draft.fandom.id, props.draft.languageId,
+        apiClient.loginInfo.account["J_ID"], rubrics.length
+      )
+    )).rubrics);
+    setRubrics([...rubrics, ...resp]);
+    console.log(resp);
+    if (resp.length < count) setCanLoadMore(false);
+  }
+
+  return (
+    <Dialog fullScreen open={props.open}>
+      <Toolbar>
+        <Typography variant="h6">Выберите рубрику</Typography>
+        <IconButton onClick={() => props.onSelect(null)} style={{marginLeft: "auto"}}>
+          <Close />
+        </IconButton>
+      </Toolbar>
+      <Container maxWidth="sm">
+        <List>
+          {rubrics.map(rubric => (
+            <ListItem button key={rubric.id} onClick={() => props.onSelect(rubric)}>
+              <ListItemText primary={rubric.name} />
+              <ListItemSecondaryAction>
+                <Karma amount={rubric.karmaCof} cof />
+              </ListItemSecondaryAction>
+            </ListItem>
+          ))}
+        </List>
+        {canLoadMore && <InView as="div" onChange={inView => inView && loadRubrics()}
+                                         style={{textAlign: "center", padding: 10}}>
           <CircularProgress />
         </InView>}
       </Container>
@@ -65,11 +112,13 @@ export default function Publish() {
   const [activeTags, setActiveTags] = useState([]);
   const [tagsLoading, setTagsLoading] = useState(true);
   const [activitySelectorOpen, setActivitySelectorOpen] = useState(false);
+  const [rubricSelectorOpen, setRubricSelectorOpen] = useState(false);
 
   const [notifyFollowers, setNotifyFollowers] = useState(false);
   const [closedPost, setClosedPost] = useState(false);
   const [multilingual, setMultilingual] = useState(false);
   const [activity, setActivity] = useState(null);
+  const [rubric, setRubric] = useState(null);
 
   useEffect(() => {
     async function load() {
@@ -90,7 +139,8 @@ export default function Publish() {
   const onPublish = async () => {
     const req = new RPostPublication(
       draftId, activeTags, "", notifyFollowers, 0,
-      closedPost, multilingual, 0, activity ? activity.id : 0, 0
+      closedPost, multilingual, rubric ? rubric.id : 0,
+      activity ? activity.id : 0, 0
     );
     await apiClient.makeRequest(req);
 
@@ -106,6 +156,16 @@ export default function Publish() {
           onSelect={activity => {
             if (activity) setActivity(activity);
             setActivitySelectorOpen(false);
+          }}
+        />
+      }
+      {
+        draft &&
+        <SelectRubricDialog
+          open={rubricSelectorOpen} draft={draft}
+          onSelect={rubric => {
+            if (rubric) setRubric(rubric);
+            setRubricSelectorOpen(false);
           }}
         />
       }
@@ -165,8 +225,13 @@ export default function Publish() {
       /><br />
 
       <List>
-        <ListItem button>
-          <ListItemText primary="Добавить рубрику" />
+        <ListItem button onClick={() => setRubricSelectorOpen(true)}>
+          <ListItemText primary={
+            rubric ? "Рубрика: " + rubric.name : "Добавить рубрику"
+          } />
+          {rubric && <ListItemSecondaryAction>
+            <IconButton onClick={() => setRubric(null)}><Delete /></IconButton>
+          </ListItemSecondaryAction>}
         </ListItem>
         <ListItem button onClick={() => setActivitySelectorOpen(true)}>
           <ListItemText primary={

@@ -10,7 +10,11 @@ function Karma(props) {
       fontWeight: "bold",
       textAlign: "center"
     }}>
-      {((props.amount) / 100).toFixed()}
+      {
+        props.cof ?
+        ((props.amount) / 100).toString() + "x" :
+        ((props.amount) / 100).toFixed()
+      }
     </span>
   );
 }
