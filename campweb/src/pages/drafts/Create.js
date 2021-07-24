@@ -28,6 +28,7 @@ import {PageQuoteCreate} from "../../components/pages/PageQuote";
 import {PageImageCreate} from "../../components/pages/PageImage";
 import {useHistory, useLocation} from "react-router-dom";
 import {PageLinkCreate} from "../../components/pages/PageLink";
+import { resizeImage } from "../../api/utils/image";
 
 function Create() {
   const apiClient = useContext(ApiContext);
@@ -68,20 +69,24 @@ function Create() {
       if (page["J_PAGE_TYPE"] === API["PAGE_TYPE_VIDEO"]) {
         req.addDataOutput(await (await fetch(proxyAddr + "yt/" + page.videoId)).blob());
       } else if (page["J_PAGE_TYPE"] === API["PAGE_TYPE_IMAGE"]) {
-        console.log(page.imageBlob);
-        req.addDataOutput(page.imageBlob);
+        console.log("[syncPageWithServer] resizing image with size:", page.imageBlob.size);
+        const resized = await resizeImage(page.imageBlob, 1500, 1024 * 128);
+        if (! resized) throw new Error("Картинка слишком большая (даже с шакалами)");
+        console.log("[syncPageWithServer] resized, resulting size:", resized.size);
+        req.addDataOutput(resized);
         req.dataOutput = [...JSON.parse(req.dataOutput), -1];
       } else if (page["J_PAGE_TYPE"] === API["PAGE_TYPE_IMAGES"]) {
-        apiClient.onError(
-          "Из-за того, что изображения должны сжиматься " +
-          "и уменьшаться на клиенте, эта функция пока не работает."
-        );
-        setLoading(false);
-        return;
-        // for (const blob of page.imageBlobs) {
-        //   req.addDataOutput(blob);
-        // }
-        // req.dataOutput = [...JSON.parse(req.dataOutput), -1];
+        for (const blob of page.imageBlobs) {
+          const resized = await resizeImage(blob, 1500, 1024 * 128);
+          if (! resized) throw new Error("image is too large");
+          req.addDataOutput(resized);
+        }
+        for (const blob of page.imageBlobs) {
+          const resized = await resizeImage(blob, 500, 1024 * 16);
+          if (! resized) throw new Error("image is too large");
+          req.addDataOutput(resized);
+        }
+        req.dataOutput = [...JSON.parse(req.dataOutput), -1];
       }
       let resp;
       try {
@@ -92,6 +97,7 @@ function Create() {
             "Скорее всего ошибка в том, что изображение " +
             "слишком большое, а сжимать их на клиенте я пока не смог."
           );
+          throw new Error("image too big");
         }
       }
       if (editing === -1) {
@@ -102,7 +108,9 @@ function Create() {
         newPages[editing] = resp.page;
         setPages(newPages);
       }
-    } catch (e) {}
+    } catch (e) {
+      apiClient.onError(e.toString());
+    }
     setLoading(false);
   }
   const flushPage = page => {

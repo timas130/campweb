@@ -1,5 +1,5 @@
 import CampfireImage from "../CampfireImage";
-import {useContext, useRef, useState} from "react";
+import {useRef, useState} from "react";
 import API from "../../api/api.json";
 import {
   Checkbox,
@@ -12,7 +12,6 @@ import {
 } from "@material-ui/core";
 import {theme} from "../../App";
 import {Add, Close, Delete, Done} from "@material-ui/icons";
-import {ApiContext} from "../../api/ApiContext";
 
 function PageImage(props) {
   // TODO: figure out gifId
@@ -26,8 +25,6 @@ function PageImage(props) {
 }
 export default PageImage;
 
-const maxSize = 131072;
-
 export function PageImageCreate(props) {
   const { onClose, open } = props;
   const [images, setImages] = useState(
@@ -38,15 +35,10 @@ export function PageImageCreate(props) {
   const [asOneBlock, setAsOneBlock] = useState(true);
   const fileInputRef = useRef();
   const fullScreen = useMediaQuery(theme.breakpoints.down("xs"));
-  const apiClient = useContext(ApiContext);
 
   const addImage = ev => {
     if (! ev.target.files[0]) return;
     const file = ev.target.files[0];
-    if (file.size > maxSize) {
-      apiClient.onError("Изображение слишком большое");
-      return;
-    }
     setImages([...images, file]);
   };
   const onDone = () => {
@@ -62,10 +54,8 @@ export function PageImageCreate(props) {
       onClose({
         J_PAGE_TYPE: API["PAGE_TYPE_IMAGES"],
         imagesCount: images.length, imageBlobs: images,
-        imagesIds: Array(images.length).fill(0),
-        imagesMiniIds: Array(images.length).fill(0),
-        imagesMiniSizesW: Array(images.length).fill(0),
-        imagesMiniSizesH: Array(images.length).fill(0),
+        imagesIds: [], imagesMiniIds: [],
+        imagesMiniSizesW: [], imagesMiniSizesH: [],
         removePageIndex: -1, replacePageIndex: -1
       });
     }
@@ -111,7 +101,10 @@ export function PageImageCreate(props) {
                 position: "relative",
                 transform: "translate(-50%, -50%)"
               }}
-              onClick={() => fileInputRef.current.click()}
+              onClick={() => {
+                fileInputRef.current.files = null;
+                fileInputRef.current.click();
+              }}
             ><Add /></IconButton>
           </GridListTile>
         </GridList>
