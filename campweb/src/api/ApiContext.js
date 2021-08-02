@@ -20,6 +20,7 @@ export class ApiClient {
 
     this.onUnauthorized = null;
     this.onError = null;
+    this.onLogin = null;
   }
 
   setLoginTokenEmail(email, password) {
@@ -40,8 +41,7 @@ export class ApiClient {
   makeRequest(req) {
     // prepare
     req["J_REQUEST_DATE"] = new Date().getTime() * 1000000;
-    if (req["J_REQUEST_NAME"] === "RAccountsLogin" && this.loginToken)
-      req["J_API_LOGIN_TOKEN"] = this.loginToken;
+    req["J_API_LOGIN_TOKEN"] = this.loginToken;
     if (this.accessToken && !req["__media__"]) req["J_API_ACCESS_TOKEN"] = this.accessToken;
     req["J_API_REFRESH_TOKEN"] = "";
     req["requestApiVersion"] = req["__media__"] ? "1" : apiVersion;
@@ -83,6 +83,7 @@ export class ApiClient {
             this.loginInfo = data["J_RESPONSE"];
             this.loginInfo.translate_map_k = JSON.parse(this.loginInfo.translate_map_k);
             this.loginInfo.translate_map_v = JSON.parse(this.loginInfo.translate_map_v);
+            this.onLogin && this.onLogin();
           }
           resolve(data["J_RESPONSE"] || {});
         } else {

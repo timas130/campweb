@@ -2,7 +2,7 @@ import { Card, CardHeader, CardContent, Typography, withStyles, CardActions, But
 import moment from "moment";
 import { useContext, useEffect, useState } from "react";
 import { ApiContext } from "../../api/ApiContext";
-import { theme } from "../../App";
+import { theme } from "../../index";
 import CampfireAvatar from "../CampfireAvatar";
 import API from "../../api/api.json";
 import RActivitiesRelayRaceMember from "../../api/requests/activities/RActivitiesRelayRaceMember";

@@ -10,7 +10,7 @@ import {
 } from "@material-ui/core";
 import {Close, Done, ExpandMore} from "@material-ui/icons";
 import {useState} from "react";
-import {theme} from "../../App";
+import {theme} from "../../index";
 import API from "../../api/api.json";
 
 function PageSpoiler(props) {

@@ -58,7 +58,9 @@ function CommentContent(props) {
       { /* TODO: sticker link */
         props.jsonDB.stickerImageId ?
         <>
-          <br /><CampfireImage id={props.jsonDB.stickerImageId} />
+          <br /><CampfireImage id={props.jsonDB.stickerImageId} style={{
+            maxWidth: "100%"
+          }} />
         </> :
         ""
       }

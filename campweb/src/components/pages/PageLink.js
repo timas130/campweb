@@ -12,7 +12,7 @@ import {
 import {Close, Done, Link as LinkIcon} from "@material-ui/icons";
 import {useState} from "react";
 import API from "../../api/api.json";
-import {theme} from "../../App";
+import {theme} from "../../index";
 
 function PageLink(props) {
   return (

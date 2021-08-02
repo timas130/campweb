@@ -26,7 +26,7 @@ import {
   achievements as achievementsList, karmaAchievements
 } from "../../api/consts/Achievements";
 import RAchievementsInfo from "../../api/requests/achievements/RAchievementsInfo";
-import {theme} from "../../App";
+import {theme} from "../../index";
 import levels, {levelTranslateNames} from "../../api/consts/Levels";
 import CampfireImage from "../../components/CampfireImage";
 import RAchievementsPack from "../../api/requests/achievements/RAchievementsPack";

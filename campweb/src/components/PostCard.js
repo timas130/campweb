@@ -6,7 +6,7 @@ import "moment/locale/ru";
 import { useContext, useState } from "react";
 import "./PostCard.css";
 import {ArrowDownward, ArrowUpward, Comment, Edit} from "@material-ui/icons";
-import { theme } from "../App";
+import { theme } from "../index";
 import { ApiContext } from "../api/ApiContext";
 import RPublicationsKarmaAdd from "../api/requests/post/RPublicationsKarmaAdd";
 import { useHistory } from "react-router";
@@ -23,7 +23,7 @@ function PostCard(props) {
   const apiClient = useContext(ApiContext);
   const history = useHistory();
 
-  const myPost = props.post.creator["J_ID"] === apiClient.loginInfo.account["J_ID"];
+  const myPost = props.post.creator["J_ID"] === (apiClient.loginInfo || {account: {J_ID: 0}}).account["J_ID"];
 
   const addKarma = async (up) => {
     // TODO: anonymous voting
@@ -34,7 +34,7 @@ function PostCard(props) {
   };
 
   return (<div style={{paddingBottom: 10, paddingTop: 10}}>
-    <Card style={{background: theme.palette.background.default}}>
+    <Card variant="outlined" style={{background: theme.palette.background.default}}>
       <CardHeader
         avatar={
           <Avatar variant={theme.avatarVariant}>

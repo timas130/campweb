@@ -14,7 +14,7 @@ import {Add, Code, Done, FormatQuote, Image, Link, TextFormat, Videocam} from "@
 import {useContext, useEffect, useState} from "react";
 import {PageTextCreate} from "../../components/pages/PageText";
 import Pages from "../../components/pages/Pages";
-import {theme} from "../../App";
+import {theme} from "../../index";
 import {PageVideoCreate} from "../../components/pages/PageVideo";
 import API from "../../api/api.json";
 import {ApiContext, proxyAddr} from "../../api/ApiContext";

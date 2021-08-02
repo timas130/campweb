@@ -79,7 +79,7 @@ macro_rules! unwrap_or_down {
 
 fn main() {
     let server = Server::http(
-        format!("0.0.0.0:{}", env::var("PORT").unwrap_or_else(|_| "8080".to_string()))
+        format!("0.0.0.0:{}", env::var("PORT").unwrap_or("8080".to_string()))
     ).expect("failed to start server");
     for mut request in server.incoming_requests() {
         spawn(move || {
@@ -111,6 +111,51 @@ fn main() {
 
             let len = unwrap_or_down!(tls.read_u32::<BigEndian>(), request);
             request.respond(Response::from_string(len.to_string())).unwrap();
+            return;
+        }
+        if request.url().starts_with("/post/") {
+            let id = &request.url()[6..];
+            let id = http_unwrap!(id.parse::<usize>(), request);
+
+            println!("[srv] type=post id={}", id);
+            let mut sess = create_session();
+            let mut tcp = http_unwrap!(create_tcpstream(), request);
+            let mut tls =
+                rustls::Stream::new(&mut sess, &mut tcp);
+            let payload = format!(
+                "{{\
+                    \"J_REQUEST_NAME\": \"RPostGet\",\
+                    \"J_REQUEST_DATE\": 1627932361289000000,\
+                    \"J_API_LOGIN_TOKEN\": \"{}\",\
+                    \"J_API_REFRESH_TOKEN\": \"\",\
+                    \"requestApiVersion\": \"1.251\",\
+                    \"requestProjectKey\": \"Campfire\",\
+                    \"unitId\": {}\
+                }}",
+                env::var("LOGIN_TOKEN").unwrap(),
+                id
+            );
+            println!("{}", payload);
+
+            http_unwrap!(tls.write_u32::<BigEndian>(payload.len() as u32), request);
+            http_unwrap!(tls.write_all(payload.as_bytes()), request);
+
+            let len = http_unwrap!(tls.read_u32::<BigEndian>(), request);
+            let mut buf = vec![0u8; len as usize];
+            http_unwrap!(tls.read_exact(&mut buf), request);
+
+            let mut resp = http_unwrap!(json::parse(
+                http_unwrap!(std::str::from_utf8(&buf), request)
+            ), request);
+            resp["J_API_ACCESS_TOKEN"].clear();
+
+            request.respond({
+                let mut resp = Response::from_data(json::stringify(resp));
+                resp.add_header(Header::from_str("Access-Control-Allow-Origin: *").unwrap());
+                resp
+            }).unwrap();
+            println!("[srv] type=response length={}", len);
+
             return;
         }
 

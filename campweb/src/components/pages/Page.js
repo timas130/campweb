@@ -7,7 +7,7 @@ import PageQuote from "./PageQuote";
 import PageLink from "./PageLink";
 import API from "../../api/api.json";
 import PagePoll from "./PagePoll";
-import {theme} from "../../App";
+import {theme} from "../../index";
 import {IconButton} from "@material-ui/core";
 import {Delete, Edit} from "@material-ui/icons";
 import PageSpoiler from "./PageSpoiler";

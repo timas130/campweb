@@ -1,4 +1,4 @@
-import { theme } from "../App";
+import { theme } from "../index";
 
 function Karma(props) {
   return (

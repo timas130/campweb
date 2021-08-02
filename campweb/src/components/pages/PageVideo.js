@@ -9,7 +9,7 @@ import {
   TextField,
   useMediaQuery
 } from "@material-ui/core";
-import {theme} from "../../App";
+import {theme} from "../../index";
 import {Close, Done} from "@material-ui/icons";
 
 function PageVideo(props) {

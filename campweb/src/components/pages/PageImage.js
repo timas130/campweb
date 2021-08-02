@@ -10,7 +10,7 @@ import {
   IconButton,
   useMediaQuery
 } from "@material-ui/core";
-import {theme} from "../../App";
+import {theme} from "../../index";
 import {Add, Close, Delete, Done} from "@material-ui/icons";
 
 function PageImage(props) {

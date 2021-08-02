@@ -11,3 +11,4 @@ rustls = {version = "0.19.1", features = ["dangerous_configuration"]}
 webpki = "0.21"
 tiny_http = "0.6"
 ureq = "2.1"
+json = "0.12.4"

@@ -6,7 +6,7 @@ import RTagsGetAll from "../../api/requests/tags/RTagsGetAll";
 import RPostGetDraft from "../../api/requests/post/RPostGetDraft";
 import {Tag} from "../../components/Tags";
 import React from "react";
-import {theme} from "../../App";
+import {theme} from "../../index";
 import {Done, Close, Delete} from "@material-ui/icons";
 import RPostPublication from "../../api/requests/post/RPostPublication";
 import {useHistory} from "react-router-dom";

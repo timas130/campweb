@@ -13,7 +13,7 @@ import {
 import RPublicationsDraftsGetAll, {amount} from "../../api/requests/post/RPublicationsDraftsGetAll";
 import PostCard from "../../components/PostCard";
 import {InView} from "react-intersection-observer";
-import {theme} from "../../App";
+import {theme} from "../../index";
 import {Add, Close} from "@material-ui/icons";
 import RFandomsGetAll, {subscribeYes, count} from "../../api/requests/fandoms/RFandomsGetAll";
 import CampfireImage from "../../components/CampfireImage";

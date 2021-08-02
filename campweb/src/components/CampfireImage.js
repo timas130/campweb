@@ -3,6 +3,7 @@ import { ApiContext } from "../api/ApiContext";
 import RResourcesGet from "../api/requests/media/RResourcesGet";
 import { CircularProgress, Backdrop } from "@material-ui/core";
 import { InView } from "react-intersection-observer";
+import {Skeleton} from "@material-ui/lab";
 
 function CampfireImage(props) {
   const [image, setImage] = useState(null);
@@ -18,7 +19,7 @@ function CampfireImage(props) {
       if (! match) {
         console.log("[CampfireImage] no cache record, fetching " + props.id);
         response = await apiClient.makeRequest(new RResourcesGet(props.id));
-        cache.put(addr, new Response(response, {status: 200, statusText: "OK"}));
+        await cache.put(addr, new Response(response, {status: 200, statusText: "OK"}));
       } else {
         response = await match.blob();
         console.log("[CampfireImage] found cache record for resource " + props.id);
@@ -47,13 +48,7 @@ function CampfireImage(props) {
       height: 100,
       ...props.style
     }} onChange={(inView) => inView && loadImage()}>
-      <CircularProgress style={{
-        position: "absolute",
-        top: "50%",
-        left: "50%",
-        marginTop: -20,
-        marginLeft: -20
-      }} />
+      <Skeleton variant="rect" width="100%" height="100%" animation={false} />
     </InView>
   );
 }

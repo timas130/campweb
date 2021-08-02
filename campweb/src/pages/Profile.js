@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from "react";
 import { useHistory, useParams } from "react-router";
 import { ApiContext } from "../api/ApiContext";
-import { theme } from "../App";
+import { theme } from "../index";
 import { CircularProgress, Collapse, Container, withStyles } from "@material-ui/core";
 import RAccountsGet from "../api/requests/accounts/RAccountsGet";
 import RAccountsGetProfile from "../api/requests/accounts/RAccountsGetProfile";

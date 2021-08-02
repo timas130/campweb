@@ -3,7 +3,7 @@ import { Check, Refresh } from "@material-ui/icons";
 import { useContext, useEffect, useState } from "react";
 import { ApiContext } from "../../api/ApiContext";
 import RPostPagePollingGet from "../../api/requests/post/RPostPagePollingGet";
-import { theme } from "../../App";
+import { theme } from "../../index";
 import RPostPagePollingVote from "../../api/requests/post/RPostPagePollingVote";
 
 const ThickLinearProgress = withStyles((theme) => ({

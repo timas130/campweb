@@ -10,7 +10,7 @@ import {
 } from "@material-ui/core";
 import {useState} from "react";
 import API from "../../api/api.json";
-import {theme} from "../../App";
+import {theme} from "../../index";
 import {Close, Done} from "@material-ui/icons";
 
 function PageQuote(props) {

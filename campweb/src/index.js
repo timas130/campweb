@@ -4,6 +4,10 @@ import './index.css';
 import App from './App';
 import * as Sentry from "@sentry/react";
 import {Integrations} from "@sentry/tracing";
+import {createMuiTheme, ThemeProvider} from "@material-ui/core";
+import {Router} from "react-router-dom";
+import {createBrowserHistory} from "history";
+import {wrapHistory} from "oaf-react-router";
 
 if (process.env.NODE_ENV === "production") {
   Sentry.init({
@@ -13,8 +17,45 @@ if (process.env.NODE_ENV === "production") {
   });
 }
 
+export const theme = createMuiTheme({
+  palette: {
+    type: "dark",
+    background: {
+      default: "#030303",
+      paper: "#212121"
+    },
+    primary: {
+      main: "#ff6c01"
+    },
+    success: {
+      main: "#4cb14e"
+    },
+    info: {
+      main: "#1d96fb"
+    },
+    error: {
+      main: "#f24239"
+    },
+    warning: {
+      main: "#ff770b"
+    }
+  }
+}, {
+  avatarVariant: window.localStorage.getItem("avatarVariant") || "rounded"
+});
+
+const browserHistory = createBrowserHistory();
+wrapHistory(browserHistory, {
+  disableAutoScrollRestoration: false,
+  restorePageStateOnPop: true
+});
+
 ReactDOM.render(
-  <App />,
+  <ThemeProvider theme={theme}>
+    <Router history={browserHistory}>
+      <App />
+    </Router>
+  </ThemeProvider>,
   document.getElementById('root')
 );
 

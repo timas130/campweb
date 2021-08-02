@@ -1,5 +1,5 @@
 import { Avatar, Badge, withStyles } from "@material-ui/core";
-import { theme } from "../App";
+import { theme } from "../index";
 import CampfireImage from "./CampfireImage";
 import { protoadmins } from "../api/ApiContext";
 import { blue, green, grey, orange, red } from "@material-ui/core/colors";

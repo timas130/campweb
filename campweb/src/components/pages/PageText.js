@@ -81,7 +81,7 @@ import {
   Tune, WbIncandescent, Whatshot,
   Widgets
 } from "@material-ui/icons";
-import {theme} from "../../App";
+import {theme} from "../../index";
 import {useState} from "react";
 import API from "../../api/api.json";
 
