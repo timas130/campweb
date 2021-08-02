@@ -1,7 +1,7 @@
 import { useContext, useState } from "react";
 import { ApiContext } from "../api/ApiContext";
 import RResourcesGet from "../api/requests/media/RResourcesGet";
-import { CircularProgress, Backdrop } from "@material-ui/core";
+import { Backdrop } from "@material-ui/core";
 import { InView } from "react-intersection-observer";
 import {Skeleton} from "@material-ui/lab";
 
