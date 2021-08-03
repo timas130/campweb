@@ -135,7 +135,6 @@ fn main() {
                 env::var("LOGIN_TOKEN").unwrap(),
                 id
             );
-            println!("{}", payload);
 
             http_unwrap!(tls.write_u32::<BigEndian>(payload.len() as u32), request);
             http_unwrap!(tls.write_all(payload.as_bytes()), request);
