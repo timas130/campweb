@@ -147,6 +147,7 @@ function App() {
           <PrivateRoute path="/account/:accountId/karma" exact><ProfileKarma /></PrivateRoute>
           <PrivateRoute path="/account/:accountId/achievements" exact><Achievements /></PrivateRoute>
         </Switch>
+        <Toolbar />
       </Box>
       <Snackbar open={!!error} autoHideDuration={5000} onClose={closeSnackbar}>
         <Alert onClose={closeSnackbar} severity="error">{error}</Alert>
